@@ -9,7 +9,7 @@ Trang nội bộ cho nhân viên TrueCommerce Vietnam. Page tự đọc folder `
 Toàn bộ làm trên github.com — **không cần dev, không cần Git**.
 
 ### Bước 1: Vào repo
-Mở `https://github.com/YOUR_GITHUB_USER/YOUR_GITHUB_REPO/tree/main/events`
+Mở `https://github.com/nhatquynhvp2806/truecommerce-vn-office-page/tree/main/events`
 
 ### Bước 2: Tạo folder mới + upload ảnh
 1. Click **"Add file"** → **"Upload files"**
@@ -64,15 +64,12 @@ Page sẽ tự thấy event mới khi bạn truy cập lần sau. Để force re
 
 ## Setup ban đầu (chỉ làm 1 lần)
 
-1. **Tạo repo GitHub** (public). Vd: `truecommerce-vn/office-page`
-2. Trong file `Vietnam Office Self-Services.html`, tìm dòng:
-   ```js
-   const GITHUB_USER   = 'YOUR_GITHUB_USER';
-   const GITHUB_REPO   = 'YOUR_GITHUB_REPO';
-   ```
-   Đổi thành username + repo name của bạn.
-3. Enable **GitHub Pages**: Repo settings → Pages → Source: `main` branch → root
-4. Trong SharePoint, dùng **Embed web part** với URL: `https://YOUR_GITHUB_USER.github.io/YOUR_GITHUB_REPO/Vietnam%20Office%20Self-Services.html`
+Đã setup xong:
+- Repo: <https://github.com/nhatquynhvp2806/truecommerce-vn-office-page>
+- Trang full: <https://nhatquynhvp2806.github.io/truecommerce-vn-office-page/Vietnam%20Office%20Self-Services.html>
+- Các embed lẻ: <https://nhatquynhvp2806.github.io/truecommerce-vn-office-page/embeds/{hero|process|services|sharing|activities|contact}.html>
+
+Trong SharePoint, dùng **Embed web part** với 1 trong các URL trên.
 
 ---
 

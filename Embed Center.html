@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Embed Center · Vietnam Office People Site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tc-navy:#002A57; --tc-navy-3:#001A38; --tc-blue:#1862D9;
+  --tc-cyan:#00B5E2; --tc-cyan-2:#5BD3F3; --tc-gold:#F5B335; --tc-coral:#FF6B4A;
+  --ink:#0B1B33; --ink-2:#36465F; --ink-3:#6B7A93;
+  --line:#E2E8F1; --line-soft:#EEF2F8; --bg:#F5F8FC; --bg-2:#ECF2FA;
+  --shadow-sm:0 1px 2px rgba(10,31,61,.06), 0 1px 1px rgba(10,31,61,.04);
+  --shadow-md:0 4px 14px rgba(10,31,61,.08), 0 2px 4px rgba(10,31,61,.04);
+  --shadow-lg:0 18px 40px rgba(10,31,61,.14), 0 6px 14px rgba(10,31,61,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Manrope',ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+code,pre{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+
+/* ---------- Top ---------- */
+.top{background:#fff;border-bottom:1px solid var(--line);padding:18px 0}
+.top-inner{display:flex;align-items:center;gap:14px}
+.logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--tc-navy),var(--tc-blue));position:relative}
+.logo::after{content:"e";color:var(--tc-cyan);font-weight:700;font-size:18px;position:absolute;inset:0;display:grid;place-items:center;letter-spacing:-0.02em}
+.top h1{font-size:16px;color:var(--tc-navy);margin:0;font-weight:700;letter-spacing:-0.01em}
+.top .meta{font-size:13px;color:var(--ink-3);margin-left:auto;display:flex;gap:8px;align-items:center}
+.top .meta a{color:var(--tc-blue);font-weight:600}
+
+/* ---------- Hero ---------- */
+.hero{padding:60px 0 36px}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tc-cyan)}
+.hero .eyebrow::before{content:"";width:22px;height:1px;background:currentColor}
+.hero h2{font-family:'Manrope';font-weight:700;font-size:clamp(34px,4.4vw,52px);line-height:1.05;letter-spacing:-0.025em;color:var(--tc-navy);margin:16px 0 18px;text-wrap:balance;max-width:780px}
+.hero h2 .accent{color:var(--tc-blue);font-weight:600}
+.hero p{font-size:17px;color:var(--ink-2);max-width:660px;line-height:1.6;margin:0}
+.hero .vn{color:var(--ink-3);font-size:14px;margin-top:6px}
+
+/* ---------- How-to strip ---------- */
+.howto{
+  margin-top:36px;background:#fff;border:1px solid var(--line);border-radius:20px;
+  display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;box-shadow:var(--shadow-sm);
+}
+.howto-step{padding:22px 24px;border-right:1px solid var(--line-soft);display:flex;gap:14px;align-items:flex-start}
+.howto-step:last-child{border-right:0}
+.howto-step .n{width:30px;height:30px;border-radius:8px;background:var(--bg-2);color:var(--tc-blue);font-weight:800;font-size:13px;display:grid;place-items:center;flex-shrink:0}
+.howto-step h4{font-size:14px;font-weight:700;color:var(--tc-navy);margin:0 0 4px;letter-spacing:-0.01em}
+.howto-step p{font-size:13px;color:var(--ink-2);margin:0;line-height:1.5}
+
+/* ---------- Embed cards ---------- */
+.embed-list{margin-top:48px;display:flex;flex-direction:column;gap:36px;padding-bottom:80px}
+.embed-card{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
+.embed-card:hover{box-shadow:var(--shadow-md)}
+.ec-head{
+  display:grid;grid-template-columns:auto 1fr auto;gap:18px;
+  padding:22px 28px;border-bottom:1px solid var(--line-soft);align-items:center;
+}
+.ec-num{
+  width:44px;height:44px;border-radius:12px;background:var(--ec-bg,var(--bg-2));color:var(--ec-c,var(--tc-blue));
+  display:grid;place-items:center;font-weight:800;font-size:18px;letter-spacing:-0.02em;
+}
+.ec-title{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ec-title h3{font-size:18px;font-weight:700;color:var(--ink);margin:0;letter-spacing:-0.015em}
+.ec-title .vn{font-size:13px;color:var(--ink-3)}
+.ec-meta{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.ec-meta .file{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-3);background:var(--bg-2);padding:5px 10px;border-radius:6px}
+.ec-meta .h{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ec-c,var(--tc-blue));background:var(--ec-bg,var(--bg-2));padding:5px 10px;border-radius:6px}
+
+.ec-body{display:grid;grid-template-columns:1.5fr 1fr;gap:0;align-items:stretch}
+@media (max-width:920px){.ec-body{grid-template-columns:1fr}}
+
+.preview-wrap{
+  position:relative;background:var(--bg);border-right:1px solid var(--line-soft);
+  min-height:420px;overflow:hidden;
+}
+@media (max-width:920px){.preview-wrap{border-right:0;border-bottom:1px solid var(--line-soft)}}
+.preview-wrap iframe{width:100%;height:100%;border:0;display:block;min-height:420px}
+.preview-overlay{
+  position:absolute;top:14px;left:14px;display:flex;gap:6px;align-items:center;z-index:5;
+  background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  box-shadow:var(--shadow-sm);
+}
+.preview-overlay .dot{width:6px;height:6px;border-radius:50%;background:#7BBA3F;box-shadow:0 0 0 3px rgba(123,186,63,.2)}
+.open-full{
+  position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;
+  font-size:12px;font-weight:700;color:var(--tc-navy);box-shadow:var(--shadow-sm);
+  transition:all .15s;z-index:5;
+}
+.open-full:hover{background:#fff;border-color:var(--tc-cyan);color:var(--tc-blue);transform:translateY(-1px)}
+.open-full svg{width:12px;height:12px}
+
+.ec-side{padding:24px 28px;display:flex;flex-direction:column;gap:18px;background:#FAFCFE}
+.ec-desc{font-size:13.5px;color:var(--ink-2);line-height:1.55;margin:0}
+.ec-tags{display:flex;gap:6px;flex-wrap:wrap}
+.ec-tags span{font-size:11px;font-weight:600;color:var(--ink-2);background:#fff;border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+
+/* code blocks */
+.code-block{position:relative;background:#0B1B33;border-radius:12px;overflow:hidden;border:1px solid #1a2a47}
+.code-tabs{display:flex;background:#091428;border-bottom:1px solid #1a2a47;padding:0 4px}
+.code-tab{
+  padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:#7d92b3;cursor:pointer;border-bottom:2px solid transparent;
+}
+.code-tab.active{color:var(--tc-cyan);border-bottom-color:var(--tc-cyan)}
+.code-tab:hover{color:#cdd9ea}
+.code-body{position:relative}
+.code-pane{display:none;padding:14px 16px;padding-right:54px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.6;color:#cdd9ea;overflow-x:auto;white-space:pre;max-height:180px;overflow-y:auto}
+.code-pane.active{display:block}
+.code-pane .k{color:#5BD3F3}
+.code-pane .s{color:#F5B335}
+.code-pane .t{color:#FF8FA3}
+.code-pane .c{color:#7d92b3;font-style:italic}
+.copy-btn{
+  position:absolute;top:8px;right:8px;
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,181,226,.15);color:var(--tc-cyan);
+  border:1px solid rgba(0,181,226,.3);border-radius:8px;
+  padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;
+  transition:all .15s;cursor:pointer;
+}
+.copy-btn:hover{background:var(--tc-cyan);color:#001a38;border-color:var(--tc-cyan)}
+.copy-btn.copied{background:#7BBA3F;color:#fff;border-color:#7BBA3F}
+.copy-btn svg{width:11px;height:11px}
+
+/* color variants */
+.ec-cyan   { --ec-c:#0698C2; --ec-bg:#E6F7FC; }
+.ec-blue   { --ec-c:#1862D9; --ec-bg:#E7F0FE; }
+.ec-coral  { --ec-c:#E0533A; --ec-bg:#FCEAE4; }
+.ec-gold   { --ec-c:#C8881A; --ec-bg:#FBF1DD; }
+.ec-violet { --ec-c:#6041B5; --ec-bg:#EDE7FA; }
+.ec-navy   { --ec-c:#002A57; --ec-bg:#E4E9F2; }
+
+/* ---------- Sticky base URL banner ---------- */
+.base-url{
+  margin-top:28px;background:linear-gradient(135deg,var(--tc-navy-3),var(--tc-navy));
+  color:#fff;border-radius:20px;padding:22px 26px;
+  display:flex;gap:18px;align-items:center;flex-wrap:wrap;
+}
+.base-url .l{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tc-cyan)}
+.base-url h4{font-size:16px;font-weight:700;margin:4px 0 6px;letter-spacing:-0.01em}
+.base-url p{font-size:13px;color:#9DB7DA;margin:0;max-width:560px;line-height:1.5}
+.base-url-input{
+  flex:1;min-width:260px;display:flex;gap:8px;align-items:center;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;padding:6px 6px 6px 14px;
+}
+.base-url-input input{
+  flex:1;background:none;border:0;outline:0;color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;
+}
+.base-url-input input::placeholder{color:#7d92b3}
+.base-url-input button{
+  background:var(--tc-cyan);color:#001a38;font-weight:700;font-size:12px;
+  border-radius:8px;padding:9px 14px;letter-spacing:.04em;
+}
+.base-url-input button:hover{background:var(--tc-cyan-2)}
+
+/* ---------- Footer ---------- */
+.foot{padding:40px 0;text-align:center;color:var(--ink-3);font-size:13px;border-top:1px solid var(--line-soft)}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--tc-navy);color:#fff;padding:12px 18px;border-radius:12px;
+  font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);
+  opacity:0;transition:all .25s;pointer-events:none;display:flex;align-items:center;gap:8px;z-index:200;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast svg{width:16px;height:16px;color:#7BBA3F}
+
+@media (max-width:920px){
+  .howto{grid-template-columns:1fr 1fr}
+  .howto-step:nth-child(2){border-right:0}
+  .howto-step:nth-child(1),.howto-step:nth-child(2){border-bottom:1px solid var(--line-soft)}
+  .ec-head{grid-template-columns:auto 1fr;gap:14px}
+  .ec-meta{grid-column:1/-1;margin-top:4px}
+}
+@media (max-width:680px){
+  .wrap{padding:0 18px}
+  .howto{grid-template-columns:1fr}
+  .howto-step{border-right:0!important;border-bottom:1px solid var(--line-soft)}
+  .howto-step:last-child{border-bottom:0}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="logo"></div>
+    <h1>Embed Center · Vietnam Office</h1>
+    <div class="meta">
+      <a href="Vietnam Office Self-Services.html">View full page →</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Embeddable sections</span>
+    <h2>Six pieces of the People Site, <span class="accent">drop in anywhere.</span></h2>
+    <p>Each section below is a standalone HTML file you can embed in SharePoint, Confluence, or any internal portal via an iframe. Pick a section, copy the embed code, paste it into your page.</p>
+    <p class="vn">Mỗi section bên dưới là 1 file HTML độc lập — copy embed code, paste vào SharePoint hoặc portal bất kỳ.</p>
+
+    <div class="howto">
+      <div class="howto-step">
+        <div class="n">1</div>
+        <div>
+          <h4>Host the files</h4>
+          <p>Upload the <code>embeds/</code> folder to your SharePoint site assets or any web-accessible location.</p>
+        </div>
+      </div>
+      <div class="howto-step">
+        <div class="n">2</div>
+        <div>
+          <h4>Set base URL</h4>
+          <p>Paste your host URL below. The embed code in every card updates automatically.</p>
+        </div>
+      </div>
+      <div class="howto-step">
+        <div class="n">3</div>
+        <div>
+          <h4>Copy &amp; paste</h4>
+          <p>Use the iframe snippet in SharePoint's <em>Embed</em> web part — or the URL in <em>Page link</em> for whole-page embeds.</p>
+        </div>
+      </div>
+      <div class="howto-step">
+        <div class="n">4</div>
+        <div>
+          <h4>Auto-resize (optional)</h4>
+          <p>Hosts that listen for <code>tc-embed-resize</code> get pixel-perfect heights; otherwise the fixed height shown applies.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="base-url">
+      <div>
+        <div class="l">Embed host</div>
+        <h4>Base URL for all embeds</h4>
+        <p>Where your <code>embeds/</code> folder lives. Saved in your browser; embed codes below regenerate on change.</p>
+      </div>
+      <div class="base-url-input">
+        <input type="text" id="baseUrl" placeholder="https://yourcompany.sharepoint.com/sites/.../SiteAssets/embeds" />
+        <button id="saveBase">Save</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="embed-list" id="embedList"></div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    TrueCommerce · Vietnam Office People Site · Embed Center v1.0
+  </div>
+</footer>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toastMsg">Copied!</span>
+</div>
+
+<script>
+// ============================================================
+// Embed registry
+// ============================================================
+const EMBEDS = [
+  {
+    n: 1, slug: 'hero', file: 'embeds/hero.html', tone: 'ec-cyan',
+    title: 'Welcome · Hero & Quick info',
+    vn: 'Lời chào, hotline lễ tân, ngày lễ, sinh nhật, người mới',
+    desc: 'Page opener with welcome message, reception phone numbers, next public holiday countdown, birthdays this week, and new joiners this month — all auto-computed from the team list.',
+    tags: ['Hotline','Holiday','Birthdays','New joiners'],
+    height: 720,
+  },
+  {
+    n: 2, slug: 'process', file: 'embeds/process.html', tone: 'ec-blue',
+    title: 'Process Deck · 27 slides',
+    vn: 'Quy trình nội bộ giải quyết thủ tục hành chính',
+    desc: 'Bilingual (VN/EN) carousel of internal admin process slides. Replace each placeholder slide with the real PNG via the documented pattern.',
+    tags: ['Carousel','Bilingual','Keyboard nav'],
+    height: 760,
+  },
+  {
+    n: 3, slug: 'services', file: 'embeds/services.html', tone: 'ec-violet',
+    title: 'Request Services · 8 cards',
+    vn: 'Đăng ký 8 dịch vụ hành chính',
+    desc: 'Eight self-service request cards: Office Supplies, Taxi Card, Employee ID, Seat ID Change, Office Issue Report, Salary Advance, OT Meal Allowance, Sport Club Fee.',
+    tags: ['8 services','SLA tags','Form links'],
+    height: 620,
+  },
+  {
+    n: 4, slug: 'sharing', file: 'embeds/sharing.html', tone: 'ec-coral',
+    title: '30-Min Sharing Service',
+    vn: 'Dịch vụ chia sẻ 30 phút với HR',
+    desc: 'Confidential well-being conversation with HR. Includes HR contacts, video instruction placeholder, and "Coffee with us" CTA.',
+    tags: ['Well-being','Confidential','Video CTA'],
+    height: 720,
+  },
+  {
+    n: 5, slug: 'activities', file: 'embeds/activities.html', tone: 'ec-gold',
+    title: '2025 Activities · Gallery',
+    vn: 'Hoạt động kết nối nhân viên',
+    desc: 'Year-filtered masonry gallery pulling event folders from a GitHub repo. Click any tile for a full-screen lightbox slideshow with thumbnail strip.',
+    tags: ['GitHub-driven','Year filter','Lightbox'],
+    height: 880,
+  },
+  {
+    n: 6, slug: 'contact', file: 'embeds/contact.html', tone: 'ec-navy',
+    title: 'Contact · Footer',
+    vn: 'Địa chỉ, hotline, link nhanh',
+    desc: 'Office address, reception phone numbers, quick-link directory to all services and resources. Use this at the bottom of any page or as a stand-alone contact block.',
+    tags: ['Address','Phone','Quick links'],
+    height: 420,
+  },
+];
+
+// ============================================================
+// Render
+// ============================================================
+const list = document.getElementById('embedList');
+const baseInput = document.getElementById('baseUrl');
+const saveBaseBtn = document.getElementById('saveBase');
+
+// Load saved base URL
+let baseUrl = localStorage.getItem('tc-embed-base') || '';
+if(baseUrl) baseInput.value = baseUrl;
+
+function getEmbedUrl(slug){
+  if(!baseUrl) return 'embeds/' + slug + '.html';
+  const b = baseUrl.replace(/\/+$/,'');
+  return b + '/' + slug + '.html';
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function buildEmbedCode(slug, height){
+  const url = getEmbedUrl(slug);
+  return `<iframe
+  src="${url}"
+  width="100%"
+  height="${height}"
+  frameborder="0"
+  scrolling="no"
+  style="border:0; display:block; width:100%;"
+  title="TrueCommerce Vietnam Office · ${slug}"
+  loading="lazy"
+></iframe>`;
+}
+
+function buildAutoResizeCode(slug, height){
+  const url = getEmbedUrl(slug);
+  return `<!-- TrueCommerce VN Office · ${slug} embed (auto-resize) -->
+<iframe id="tc-${slug}" src="${url}"
+  width="100%" height="${height}" frameborder="0" scrolling="no"
+  style="border:0; display:block; width:100%;"
+  title="TrueCommerce Vietnam Office · ${slug}"></iframe>
+<script>
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'tc-embed-resize' && e.data.name === '${slug}'){
+      var f = document.getElementById('tc-${slug}');
+      if(f) f.style.height = e.data.height + 'px';
+    }
+  });
+<\/script>`;
+}
+
+function syntaxHighlight(html){
+  return escapeHtml(html)
+    .replace(/(&lt;\/?)([a-z][a-z0-9-]*)/gi, '$1<span class="t">$2</span>')
+    .replace(/([a-z-]+)(=)(&quot;[^&]*?&quot;)/gi, '<span class="k">$1</span>$2<span class="s">$3</span>')
+    .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="c">$1</span>');
+}
+
+function render(){
+  list.innerHTML = '';
+  EMBEDS.forEach(e => {
+    const card = document.createElement('article');
+    card.className = 'embed-card ' + e.tone;
+    const url = getEmbedUrl(e.slug);
+    const directCode  = buildEmbedCode(e.slug, e.height);
+    const autoCode    = buildAutoResizeCode(e.slug, e.height);
+    const urlCode     = url;
+
+    card.innerHTML = `
+      <div class="ec-head">
+        <div class="ec-num">0${e.n}</div>
+        <div class="ec-title">
+          <h3>${e.title}</h3>
+          <div class="vn">${e.vn}</div>
+        </div>
+        <div class="ec-meta">
+          <span class="file">embeds/${e.slug}.html</span>
+          <span class="h">~${e.height}px tall</span>
+        </div>
+      </div>
+      <div class="ec-body">
+        <div class="preview-wrap">
+          <div class="preview-overlay"><span class="dot"></span> Live preview</div>
+          <a class="open-full" href="embeds/${e.slug}.html" target="_blank" rel="noopener">
+            Open in tab
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          </a>
+          <iframe data-slug="${e.slug}" src="embeds/${e.slug}.html" loading="lazy"></iframe>
+        </div>
+        <div class="ec-side">
+          <p class="ec-desc">${e.desc}</p>
+          <div class="ec-tags">
+            ${e.tags.map(t => `<span>${t}</span>`).join('')}
+          </div>
+
+          <div class="code-block">
+            <div class="code-tabs">
+              <div class="code-tab active" data-pane="iframe">Iframe</div>
+              <div class="code-tab" data-pane="auto">Auto-resize</div>
+              <div class="code-tab" data-pane="url">URL only</div>
+            </div>
+            <div class="code-body">
+              <pre class="code-pane active" data-pane="iframe">${syntaxHighlight(directCode)}</pre>
+              <pre class="code-pane" data-pane="auto">${syntaxHighlight(autoCode)}</pre>
+              <pre class="code-pane" data-pane="url">${escapeHtml(urlCode)}</pre>
+              <button class="copy-btn" data-copy="${e.slug}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // wire up tab switching
+    const tabs = card.querySelectorAll('.code-tab');
+    const panes = card.querySelectorAll('.code-pane');
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.toggle('active', x === t));
+      const which = t.dataset.pane;
+      panes.forEach(p => p.classList.toggle('active', p.dataset.pane === which));
+    }));
+
+    // wire up copy button
+    const copyBtn = card.querySelector('.copy-btn');
+    copyBtn.addEventListener('click', () => {
+      const activePane = card.querySelector('.code-pane.active');
+      const text = activePane.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.classList.add('copied');
+        copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg> Copied`;
+        showToast('Embed code copied');
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+        }, 1800);
+      });
+    });
+
+    list.appendChild(card);
+  });
+
+  // size iframes to declared heights
+  document.querySelectorAll('.preview-wrap iframe').forEach(f => {
+    const slug = f.dataset.slug;
+    const meta = EMBEDS.find(x => x.slug === slug);
+    if(meta) f.style.minHeight = meta.height + 'px';
+  });
+}
+
+// Listen to height messages from embeds and resize iframes accordingly
+window.addEventListener('message', (e) => {
+  const d = e.data;
+  if(!d || d.type !== 'tc-embed-resize') return;
+  const f = document.querySelector('iframe[data-slug="' + d.name + '"]');
+  if(f) f.style.height = d.height + 'px';
+});
+
+// Base URL persistence
+saveBaseBtn.addEventListener('click', () => {
+  baseUrl = baseInput.value.trim();
+  localStorage.setItem('tc-embed-base', baseUrl);
+  render();
+  showToast(baseUrl ? 'Base URL saved · embed code updated' : 'Base URL cleared');
+});
+baseInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') saveBaseBtn.click(); });
+
+// Toast
+const toast = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMsg');
+let toastTimer;
+function showToast(msg){
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+render();
+</script>
+
+</body>
+</html>

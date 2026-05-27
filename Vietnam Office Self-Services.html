@@ -1,0 +1,1634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vietnam Office · Employee Self-Services · TrueCommerce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ---------- TrueCommerce brand tokens ---------- */
+:root{
+  --tc-navy:        #002A57;   /* primary deep navy */
+  --tc-navy-2:      #0A1F3D;   /* darker, hero */
+  --tc-navy-3:      #001A38;   /* deepest */
+  --tc-blue:        #1862D9;   /* bright corporate blue */
+  --tc-cyan:        #00B5E2;   /* the 'e' accent / interactive */
+  --tc-cyan-2:      #5BD3F3;   /* light cyan */
+  --tc-gold:        #F5B335;   /* warm CTA accent */
+  --tc-coral:       #FF6B4A;   /* community / events accent */
+
+  --ink:            #0B1B33;
+  --ink-2:          #36465F;
+  --ink-3:          #6B7A93;
+  --line:           #E2E8F1;
+  --line-soft:      #EEF2F8;
+  --bg:             #F5F8FC;
+  --bg-2:           #ECF2FA;
+  --white:          #FFFFFF;
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  --shadow-sm: 0 1px 2px rgba(10,31,61,.06), 0 1px 1px rgba(10,31,61,.04);
+  --shadow-md: 0 4px 14px rgba(10,31,61,.08), 0 2px 4px rgba(10,31,61,.04);
+  --shadow-lg: 0 18px 40px rgba(10,31,61,.14), 0 6px 14px rgba(10,31,61,.06);
+  --shadow-xl: 0 30px 70px rgba(10,31,61,.22);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{
+  font-family:'Manrope', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  line-height:1.55;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+.mono{font-feature-settings:"tnum" 1, "ss01" 1}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tc-cyan);
+}
+.eyebrow::before{content:"";width:22px;height:1px;background:currentColor}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  background:var(--white);
+  border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:saturate(150%) blur(8px);
+}
+.topbar-inner{display:flex;align-items:center;gap:32px;height:64px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-0.01em;font-size:17px;color:var(--tc-navy)}
+.brand .logo{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--tc-navy) 0%, var(--tc-blue) 100%);
+  color:#fff;display:grid;place-items:center;font-weight:800;
+  position:relative;overflow:hidden;
+}
+.brand .logo::after{
+  content:"e";font-family:'Manrope',sans-serif;font-weight:700;
+  color:var(--tc-cyan);font-size:20px;line-height:1;
+  position:absolute;inset:0;display:grid;place-items:center;letter-spacing:-0.02em;
+}
+.brand .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.brand .label{font-weight:600;color:var(--ink-2);font-size:14px}
+.brand .label b{color:var(--ink);font-weight:700}
+.nav{margin-left:auto;display:flex;align-items:center;gap:4px}
+.nav a{
+  padding:8px 14px;border-radius:999px;font-size:14px;font-weight:600;color:var(--ink-2);
+  transition:background .15s, color .15s;
+}
+.nav a:hover{background:var(--bg-2);color:var(--tc-navy)}
+.nav a.active{background:var(--tc-navy);color:#fff}
+.btn-help{
+  padding:9px 16px;border-radius:999px;background:var(--tc-cyan);color:#001a38;
+  font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 6px 16px rgba(0,181,226,.35);
+}
+.btn-help:hover{transform:translateY(-1px)}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;color:#fff;overflow:hidden;
+  background:
+    radial-gradient(1100px 600px at 90% -10%, rgba(0,181,226,.35), transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, rgba(24,98,217,.45), transparent 55%),
+    linear-gradient(160deg,var(--tc-navy-3) 0%, var(--tc-navy) 50%, #002F66 100%);
+}
+.hero-inner{
+  display:grid;grid-template-columns:1.15fr .85fr;gap:48px;
+  padding:74px 0 96px;align-items:center;position:relative;z-index:2;
+}
+.hero h1{
+  font-family:'Manrope',sans-serif;font-weight:700;
+  font-size:clamp(40px, 5.4vw, 64px);line-height:1.05;letter-spacing:-0.03em;
+  margin:18px 0 18px;text-wrap:balance;
+}
+.hero h1 .accent{color:var(--tc-cyan-2);font-weight:700}
+.hero .sub{color:#cdd9ea;font-size:17px;max-width:540px;line-height:1.6}
+.hero .vn{color:#9DB7DA;font-size:14px;margin-top:8px}
+.hero .quick{
+  margin-top:32px;display:flex;flex-wrap:wrap;gap:10px;
+}
+.hero .quick a{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 14px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);border-radius:999px;
+  font-size:13px;font-weight:600;color:#E4EEFB;backdrop-filter:blur(4px);
+  transition:all .15s;
+}
+.hero .quick a:hover{background:rgba(255,255,255,.12);border-color:rgba(0,181,226,.5);color:#fff;transform:translateY(-1px)}
+.hero .quick a svg{width:14px;height:14px;color:var(--tc-cyan)}
+
+/* hero self-service collage */
+.hero-collage{
+  position:relative;width:100%;max-width:500px;justify-self:end;
+  aspect-ratio:1/1;
+}
+.hc-tile{
+  position:absolute;background:#fff;border-radius:16px;padding:14px 16px;
+  box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:12px;
+  min-width:200px;animation:float 6s ease-in-out infinite;
+}
+.hc-tile .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:#fff;flex-shrink:0}
+.hc-tile .ic svg{width:18px;height:18px}
+.hc-tile .ttl{font-weight:700;color:var(--ink);font-size:14px;line-height:1.2}
+.hc-tile .sub{color:var(--ink-3);font-size:11.5px;margin-top:2px}
+.hc-tile .chk{margin-left:auto;width:22px;height:22px;border-radius:50%;background:#7BBA3F;color:#fff;display:grid;place-items:center;flex-shrink:0}
+.hc-tile .chk svg{width:12px;height:12px}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.hc-1{top:8%;left:-8%;animation-delay:0s}
+.hc-1 .ic{background:var(--tc-cyan)}
+.hc-2{top:26%;right:-6%;animation-delay:1s}
+.hc-2 .ic{background:var(--tc-gold)}
+.hc-3{top:52%;left:-4%;animation-delay:2s}
+.hc-3 .ic{background:var(--tc-coral)}
+.hc-4{bottom:8%;right:0%;animation-delay:3s}
+.hc-4 .ic{background:#1BAE9A}
+.hc-center{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle, rgba(0,181,226,.25) 0%, transparent 70%);
+  display:grid;place-items:center;
+}
+.hc-center::before, .hc-center::after{
+  content:"";position:absolute;border-radius:50%;border:1px dashed rgba(0,181,226,.3);
+}
+.hc-center::before{inset:-30px;animation:spin 30s linear infinite}
+.hc-center::after{inset:-70px;border-color:rgba(255,255,255,.1);animation:spin 50s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hc-center-inner{
+  width:80px;height:80px;border-radius:24px;
+  background:linear-gradient(135deg,#fff,#E4EEFB);
+  display:grid;place-items:center;box-shadow:var(--shadow-xl);
+  color:var(--tc-navy);position:relative;z-index:2;
+}
+.hc-center-inner svg{width:36px;height:36px}
+
+.hero-grid-bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse at 80% 30%, #000 0%, transparent 70%);
+  z-index:1;
+}
+
+/* ---------- Stats strip (quick info) ---------- */
+.stats{
+  position:relative;z-index:3;margin-top:-44px;
+}
+.stats-inner{
+  background:#fff;border-radius:20px;box-shadow:var(--shadow-lg);
+  display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;
+  border:1px solid var(--line-soft);
+}
+.stat{
+  padding:22px 24px;border-right:1px solid var(--line-soft);position:relative;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.stat:last-child{border-right:0}
+.stat .si{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  display:grid;place-items:center;color:#fff;
+}
+.stat .si svg{width:18px;height:18px}
+.stat:nth-child(1) .si{background:var(--tc-cyan)}
+.stat:nth-child(2) .si{background:var(--tc-blue)}
+.stat:nth-child(3) .si{background:var(--tc-coral)}
+.stat:nth-child(4) .si{background:var(--tc-gold)}
+.stat .sc{display:flex;flex-direction:column;min-width:0;flex:1}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);font-weight:700}
+.stat .v{
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:18px;line-height:1.25;
+  color:var(--tc-navy);margin-top:4px;letter-spacing:-0.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.stat .v a{color:var(--tc-navy)}
+.stat .v a:hover{color:var(--tc-blue);text-decoration:underline}
+.stat .d{font-size:12.5px;color:var(--ink-2);margin-top:2px;line-height:1.45}
+
+/* ---------- Announcements ---------- */
+.ann{margin-top:32px}
+.ann-card{
+  background:#fff;border:1px solid var(--line);border-radius:18px;
+  padding:18px 22px;display:flex;align-items:center;gap:18px;
+  box-shadow:var(--shadow-sm);
+}
+.ann-tag{
+  background:linear-gradient(135deg,var(--tc-coral),#F5B335);
+  color:#fff;font-weight:800;font-size:11px;letter-spacing:.12em;
+  padding:6px 12px;border-radius:999px;text-transform:uppercase;flex-shrink:0;
+}
+.ann-strip{display:flex;gap:36px;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.ann-strip-track{display:flex;gap:36px;animation:marquee 38s linear infinite;flex-shrink:0}
+.ann-item{display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:14px;color:var(--ink-2)}
+.ann-item b{color:var(--ink);font-weight:700}
+.ann-item .pill{font-size:11px;font-weight:700;background:var(--bg-2);color:var(--tc-navy);padding:2px 8px;border-radius:6px}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- Section anchor nav ---------- */
+.anchor-nav{
+  position:sticky;top:64px;background:rgba(245,248,252,.92);
+  backdrop-filter:saturate(160%) blur(10px);
+  border-bottom:1px solid var(--line);z-index:40;margin-top:48px;
+}
+.anchor-nav-inner{display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:none}
+.anchor-nav-inner::-webkit-scrollbar{display:none}
+.anchor-nav a{
+  padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;
+  color:var(--ink-2);white-space:nowrap;
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid transparent;transition:all .15s;
+}
+.anchor-nav a:hover{background:#fff;border-color:var(--line);color:var(--tc-navy)}
+.anchor-nav a .n{
+  font-size:10px;font-weight:800;background:var(--tc-navy);color:#fff;
+  width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+}
+
+/* ---------- Section frame ---------- */
+section.block{padding:80px 0;position:relative}
+.sec-head{margin-bottom:36px;max-width:none}
+.sec-head h2{
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:clamp(28px, 3.2vw, 40px);
+  line-height:1.12;letter-spacing:-0.025em;color:var(--tc-navy);margin:10px 0 8px;
+  text-wrap:balance;
+}
+.sec-head h2 .accent{color:var(--tc-blue);font-weight:600}
+.sec-head .vn{color:var(--ink-3);font-size:15px;margin-top:4px}
+.sec-head p{color:var(--ink-2);font-size:16px;max-width:640px}
+
+/* ---------- Slide deck carousel ---------- */
+.slide-deck{
+  background:linear-gradient(160deg,var(--tc-navy-3),var(--tc-navy));
+  border-radius:28px;padding:28px;color:#fff;position:relative;overflow:hidden;
+  box-shadow:var(--shadow-md);
+}
+.slide-deck::before{
+  content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;
+  border:1px solid rgba(255,255,255,.08);border-radius:50%;pointer-events:none;
+}
+.slide-deck::after{
+  content:"";position:absolute;right:-160px;top:-160px;width:500px;height:500px;
+  border:1px solid rgba(255,255,255,.05);border-radius:50%;pointer-events:none;
+}
+.sd-head{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  flex-wrap:wrap;padding:6px 10px 18px;position:relative;z-index:2;
+}
+.sd-head .tag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tc-cyan);padding:6px 12px;
+  border:1px solid rgba(0,181,226,.3);border-radius:6px;
+}
+.sd-head .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.sv-stage{
+  position:relative;z-index:2;border-radius:14px;overflow:hidden;
+  background:#0E2A4D;aspect-ratio:16/9;
+  box-shadow:0 30px 60px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.08) inset;
+}
+.sv-track{
+  display:flex;width:100%;height:100%;
+  transition:transform .45s cubic-bezier(.7,.0,.2,1);
+}
+.sv-slide{
+  flex:0 0 100%;width:100%;height:100%;position:relative;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:44px 48px;
+  background:linear-gradient(155deg,#0E2A4D 0%, #001A38 100%);overflow:hidden;
+}
+.sv-slide img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  background:#0E2A4D;
+}
+.sv-slide .ring1, .sv-slide .ring2{
+  position:absolute;border-radius:50%;pointer-events:none;
+}
+.sv-slide .ring1{right:-60px;top:-60px;width:280px;height:280px;border:1px solid rgba(0,181,226,.2);}
+.sv-slide .ring2{right:-120px;top:-120px;width:400px;height:400px;border:1px solid rgba(0,181,226,.1);}
+.sv-slide .sd-logo{font-size:26px;font-weight:700;letter-spacing:-0.02em;color:#fff;margin-bottom:20px;position:relative;z-index:2}
+.sv-slide .sd-logo .e{color:inherit}
+.sv-slide .sd-title{
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:clamp(22px,2.6vw,32px);
+  line-height:1.18;letter-spacing:-0.02em;color:#fff;margin:0 0 12px;position:relative;z-index:2;
+  text-wrap:balance;max-width:90%;
+}
+.sv-slide .sd-sub{font-size:14px;color:#9DB7DA;position:relative;z-index:2}
+.sv-slide.is-content{justify-content:flex-start;padding:48px 56px}
+.sv-slide.is-content .sd-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tc-cyan);margin-bottom:18px;
+}
+.sv-slide.is-content h4{
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:clamp(22px,2.4vw,30px);
+  letter-spacing:-0.02em;line-height:1.18;color:#fff;margin:0 0 18px;
+}
+.sv-slide.is-content ol, .sv-slide.is-content ul{
+  margin:0;padding:0 0 0 22px;color:#cdd9ea;font-size:15px;line-height:1.7;max-width:84%;
+}
+
+.sv-prev, .sv-next{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);
+  color:#fff;display:grid;place-items:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px);
+  transition:all .15s;
+}
+.sv-prev{left:14px}
+.sv-next{right:14px}
+.sv-prev:hover, .sv-next:hover{background:var(--tc-cyan);color:#001a38;border-color:var(--tc-cyan);transform:translateY(-50%) scale(1.06)}
+.sv-prev:disabled, .sv-next:disabled{opacity:.3;cursor:not-allowed}
+.sv-prev svg, .sv-next svg{width:18px;height:18px}
+
+.sd-foot{
+  position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  gap:18px;padding:18px 10px 6px;flex-wrap:wrap;
+}
+.sv-counter{font-size:13px;font-weight:600;color:#9DB7DA;letter-spacing:.04em}
+.sv-counter b{color:#fff;font-weight:700}
+.sv-dots{display:flex;gap:6px;flex-wrap:wrap;max-width:60%;justify-content:flex-end}
+.sv-dot{
+  width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;
+  transition:all .2s;
+}
+.sv-dot:hover{background:rgba(255,255,255,.35)}
+.sv-dot.active{background:var(--tc-cyan);width:24px;border-radius:4px}
+@media (max-width:680px){
+  .slide-deck{padding:18px}
+  .sv-slide{padding:28px 24px}
+  .sv-slide.is-content{padding:28px 24px}
+  .sd-foot{padding:14px 4px 4px}
+}
+.slide-preview::before{
+  content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;
+  border:1px solid rgba(255,255,255,.08);border-radius:50%;pointer-events:none;
+}
+.slide-preview::after{
+  content:"";position:absolute;right:-160px;top:-160px;width:500px;height:500px;
+  border:1px solid rgba(255,255,255,.05);border-radius:50%;pointer-events:none;
+}
+.sp-left{position:relative;z-index:2}
+.sp-left .tag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tc-cyan);padding:6px 12px;
+  border:1px solid rgba(0,181,226,.3);border-radius:6px;
+}
+.sp-left h3{
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:30px;line-height:1.15;
+  letter-spacing:-0.02em;margin:18px 0 6px;color:#fff;
+}
+.sp-left .vn-h{color:var(--tc-cyan-2);font-size:14px;margin-bottom:18px}
+.sp-left p{color:#9DB7DA;font-size:15px;line-height:1.6;max-width:420px;margin:0 0 28px}
+.sp-left .ctas{display:flex;gap:10px;flex-wrap:wrap}
+.sp-right{
+  position:relative;z-index:2;aspect-ratio:16/10;
+  background:linear-gradient(155deg,#0E2A4D 0%, #001A38 100%);
+  border-radius:14px;overflow:hidden;
+  box-shadow:0 30px 60px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.08) inset;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:32px;
+}
+.sp-right .sp-ring1, .sp-right .sp-ring2{
+  position:absolute;border-radius:50%;pointer-events:none;
+}
+.sp-right .sp-ring1{right:-50px;top:-50px;width:240px;height:240px;border:1px solid rgba(0,181,226,.2);}
+.sp-right .sp-ring2{right:-100px;top:-100px;width:340px;height:340px;border:1px solid rgba(0,181,226,.1);}
+.sp-right .sp-logo{font-size:24px;font-weight:700;letter-spacing:-0.02em;color:#fff;margin-bottom:18px;position:relative;z-index:2;display:flex;align-items:baseline;gap:0}
+.sp-right .sp-logo .e{color:var(--tc-cyan)}
+.sp-right .sp-title{
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:22px;line-height:1.22;
+  letter-spacing:-0.02em;color:#fff;margin:0 0 10px;position:relative;z-index:2;
+}
+.sp-right .sp-date{font-size:13px;color:#9DB7DA;position:relative;z-index:2}
+.sp-right .sp-counter{
+  position:absolute;left:32px;top:32px;font-size:11px;font-weight:700;color:#7d92b3;
+  letter-spacing:.12em;text-transform:uppercase;z-index:2;
+}
+@media (max-width:900px){
+  .slide-preview{grid-template-columns:1fr;padding:36px;gap:28px}
+}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;padding:13px 20px;
+  border-radius:12px;font-weight:700;font-size:14px;transition:all .15s;
+}
+.btn-primary{background:var(--tc-cyan);color:#001a38;box-shadow:0 8px 22px rgba(0,181,226,.35)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(0,181,226,.45)}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+
+/* ---------- Services grid ---------- */
+.services{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.svc{
+  background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;
+  display:flex;flex-direction:column;gap:10px;
+  transition:transform .2s, box-shadow .2s, border-color .2s;
+  position:relative;overflow:hidden;min-height:200px;
+}
+.svc:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--svc-c1,var(--tc-blue))}
+.svc::before{display:none}
+.svc > *{position:relative;z-index:1}
+.svc .icon{
+  width:40px;height:40px;border-radius:11px;display:grid;place-items:center;
+  background:var(--svc-bg, var(--bg-2));color:var(--svc-c1, var(--tc-blue));
+}
+.svc .icon svg{width:20px;height:20px}
+.svc h3{font-size:15.5px;font-weight:700;color:var(--ink);margin:0;letter-spacing:-0.01em;line-height:1.25}
+.svc .vn{color:var(--ink-3);font-size:12px;margin-top:-6px}
+.svc p{color:var(--ink-2);font-size:13px;margin:0;line-height:1.5}
+.svc ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.svc ul li{font-size:12.5px;color:var(--ink-2);padding-left:14px;position:relative;line-height:1.4}
+.svc ul li::before{
+  content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;
+  background:var(--svc-c1,var(--tc-cyan));
+}
+.svc .foot{margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.svc .sla{
+  font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--svc-c1,var(--tc-blue));background:var(--svc-bg, var(--bg-2));
+  padding:4px 9px;border-radius:6px;
+}
+.svc-btn{
+  display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:12.5px;
+  color:var(--svc-c1,var(--tc-navy));padding:0;
+}
+.svc-btn:hover{text-decoration:underline}
+.svc-btn svg{transition:transform .15s}
+.svc-btn:hover svg{transform:translateX(3px)}
+
+/* color variants */
+.svc.c-cyan   { --svc-c1:#0698C2;  --svc-c2:#00B5E2;  --svc-bg:#E6F7FC; }
+.svc.c-blue   { --svc-c1:#1862D9;  --svc-c2:#0073E6;  --svc-bg:#E7F0FE; }
+.svc.c-navy   { --svc-c1:#002A57;  --svc-c2:#1B4FB3;  --svc-bg:#E4E9F2; }
+.svc.c-gold   { --svc-c1:#C8881A;  --svc-c2:#F5B335;  --svc-bg:#FBF1DD; }
+.svc.c-coral  { --svc-c1:#E0533A;  --svc-c2:#FF6B4A;  --svc-bg:#FCEAE4; }
+.svc.c-green  { --svc-c1:#3E8A2E;  --svc-c2:#7BBA3F;  --svc-bg:#EAF4DF; }
+.svc.c-violet { --svc-c1:#6041B5;  --svc-c2:#8A6CE3;  --svc-bg:#EDE7FA; }
+.svc.c-teal   { --svc-c1:#107A6B;  --svc-c2:#1BAE9A;  --svc-bg:#E0F4F0; }
+
+/* ---------- 30-min Sharing ---------- */
+.sharing{
+  background:linear-gradient(155deg, #FFF6E9 0%, #FCEAE4 60%, #F4E6FB 100%);
+  border-radius:32px;padding:64px;display:grid;grid-template-columns:1fr 1.05fr;gap:48px;
+  position:relative;overflow:hidden;
+}
+.sharing::after{
+  content:"";position:absolute;right:-120px;bottom:-120px;width:360px;height:360px;
+  border:1px solid rgba(0,42,87,.08);border-radius:50%;
+}
+.sharing::before{
+  content:"";position:absolute;right:-60px;bottom:-60px;width:240px;height:240px;
+  border:1px solid rgba(0,42,87,.06);border-radius:50%;
+}
+.sharing h2{font-family:'Manrope',sans-serif;font-weight:700;font-size:clamp(28px,3.2vw,40px);line-height:1.12;color:var(--tc-navy);letter-spacing:-0.025em;margin:14px 0 16px}
+.sharing h2 .accent{color:var(--tc-coral);font-weight:600}
+.sharing .lead{font-size:16px;color:var(--ink-2);max-width:480px;line-height:1.6}
+.sharing .lead .vn{display:block;font-size:14px;color:var(--ink-3);margin-top:8px}
+.sharing .quote{
+  margin-top:28px;padding:20px 22px;background:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.9);backdrop-filter:blur(6px);
+  border-radius:16px;font-size:16px;line-height:1.5;color:var(--tc-navy);font-weight:500;
+}
+.sharing .quote::before{content:"\201C";font-size:48px;line-height:0;vertical-align:-12px;color:var(--tc-coral);margin-right:6px}
+.contacts{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.contact{
+  background:#fff;border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow-sm);border:1px solid rgba(255,255,255,.8);
+}
+.contact .av{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;
+}
+.contact .av.qv{background:linear-gradient(135deg,#F5B335,#FF6B4A)}
+.contact .av.nt{background:linear-gradient(135deg,#1862D9,#00B5E2)}
+.contact .name{font-weight:700;color:var(--ink);font-size:14px}
+.contact .role{font-size:12px;color:var(--ink-3)}
+
+.sharing-right{
+  background:linear-gradient(180deg,var(--tc-navy),var(--tc-navy-3));
+  border-radius:24px;overflow:hidden;position:relative;
+  box-shadow:var(--shadow-xl);min-height:420px;
+}
+.sharing-right .video-frame{position:absolute;inset:0;display:grid;place-items:center;color:#fff}
+.sharing-right .video-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(255,107,74,.4) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(0,181,226,.4) 0%, transparent 50%),
+    linear-gradient(180deg,#0A1F3D,#001A38);
+}
+.sharing-right .video-bg::before{
+  content:"";position:absolute;inset:0;
+  background-image:radial-gradient(circle at 50% 50%, rgba(255,255,255,.08) 1px, transparent 1px);
+  background-size:24px 24px;
+}
+.video-card{
+  position:relative;z-index:2;text-align:center;padding:32px;max-width:80%;
+}
+.video-card .play{
+  width:84px;height:84px;border-radius:50%;background:#fff;
+  display:grid;place-items:center;margin:0 auto 22px;cursor:pointer;
+  box-shadow:0 0 0 0 rgba(255,255,255,.4);
+  animation:pulse 2.2s ease-out infinite;transition:transform .2s;
+}
+.video-card .play:hover{transform:scale(1.06)}
+.video-card .play svg{width:30px;height:30px;color:var(--tc-navy);margin-left:4px}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}
+  70%{box-shadow:0 0 0 28px rgba(255,255,255,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}
+}
+.video-card .title{font-family:'Manrope',sans-serif;font-size:22px;font-weight:700;line-height:1.25;margin:0 0 6px;letter-spacing:-0.015em}
+.video-card .sub{font-size:14px;color:#9DB7DA}
+.video-meta{
+  position:absolute;left:24px;bottom:24px;display:flex;gap:8px;flex-wrap:wrap;z-index:2;
+}
+.video-meta span{
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  padding:6px 10px;border-radius:999px;color:#cdd9ea;
+}
+
+/* ---------- Gallery ---------- */
+.gallery-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{
+  padding:8px 14px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;font-weight:600;font-size:13px;color:var(--ink-2);transition:all .15s;
+}
+.filters button:hover{border-color:var(--tc-cyan);color:var(--tc-navy)}
+.filters button.active{background:var(--tc-navy);color:#fff;border-color:var(--tc-navy)}
+
+/* ---------- Gallery / Tiles ---------- */
+.masonry{
+  margin-top:28px;
+  column-count:4;column-gap:16px;
+}
+.tile{
+  break-inside:avoid;margin-bottom:16px;border-radius:18px;overflow:hidden;
+  position:relative;cursor:pointer;background:#0A1F3D;
+  box-shadow:var(--shadow-sm);transition:transform .25s, box-shadow .25s;
+}
+.tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.tile .ph{
+  width:100%;display:block;position:relative;overflow:hidden;
+  background:linear-gradient(135deg, var(--c1,#1862D9), var(--c2,#00B5E2));
+}
+.tile .ph img{
+  width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;
+  transition:transform .5s;
+}
+.tile:hover .ph img{transform:scale(1.04)}
+.tile .ph::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 60%);
+  pointer-events:none;
+}
+.tile .label{
+  position:absolute;left:14px;bottom:14px;right:14px;color:#fff;z-index:3;
+}
+.tile .label .ttl{font-weight:700;font-size:15px;letter-spacing:-0.01em;text-shadow:0 1px 6px rgba(0,0,0,.5);line-height:1.25}
+.tile .label .sub{font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tile .grad{position:absolute;inset:0;background:linear-gradient(180deg, transparent 45%, rgba(0,0,0,.7) 100%);z-index:2;pointer-events:none}
+.tile .video-pill{
+  position:absolute;top:14px;right:14px;width:36px;height:36px;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border-radius:50%;
+  display:grid;place-items:center;z-index:4;color:#fff;
+}
+.tile .video-pill svg{width:16px;height:16px;margin-left:2px}
+.tile .count-pill{
+  position:absolute;top:14px;right:14px;font-size:11px;font-weight:700;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);color:#fff;
+  padding:5px 9px;border-radius:999px;z-index:4;letter-spacing:.04em;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.tile .count-pill svg{width:11px;height:11px}
+.tile.has-video .count-pill{top:auto;bottom:54px}
+
+/* fallback heights when no image */
+.tile .ph{aspect-ratio: 4/3}
+.tile.h-m .ph{aspect-ratio: 4/4}
+.tile.h-l .ph{aspect-ratio: 4/5}
+.tile.h-xl .ph{aspect-ratio: 3/4}
+
+/* loading + empty states */
+.gallery-loading, .gallery-empty{
+  text-align:center;padding:48px 24px;color:var(--ink-3);
+}
+.gallery-empty{
+  background:#fff;border:1px dashed var(--line);border-radius:18px;margin-top:28px;
+}
+.gallery-empty .ge-icon{
+  width:56px;height:56px;border-radius:14px;background:var(--bg-2);
+  color:var(--tc-blue);display:grid;place-items:center;margin:0 auto 14px;
+}
+.gallery-empty .ge-icon svg{width:26px;height:26px}
+.gallery-empty h3{font-size:18px;color:var(--tc-navy);margin:0 0 6px;font-weight:700}
+.gallery-empty p{font-size:14px;color:var(--ink-3);margin:0;line-height:1.6}
+.gl-spinner{
+  width:38px;height:38px;border-radius:50%;
+  border:3px solid var(--line-soft);border-top-color:var(--tc-cyan);
+  animation:spin 1s linear infinite;margin:0 auto 14px;
+}
+.gallery-loading p{font-size:14px;margin:0}
+
+/* ---------- Lightbox (slideshow) ---------- */
+.lightbox{
+  position:fixed;inset:0;background:rgba(2,9,22,.96);backdrop-filter:blur(8px);
+  z-index:100;display:none;flex-direction:column;
+}
+.lightbox.open{display:flex}
+.lb-close, .lb-prev, .lb-next{
+  position:absolute;width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);
+  cursor:pointer;transition:all .15s;z-index:5;
+}
+.lb-close:hover, .lb-prev:hover, .lb-next:hover{background:rgba(255,255,255,.22);transform:scale(1.06)}
+.lb-close{top:20px;right:20px}
+.lb-prev{top:50%;left:20px;transform:translateY(-50%)}
+.lb-next{top:50%;right:20px;transform:translateY(-50%)}
+.lb-prev:hover, .lb-next:hover{transform:translateY(-50%) scale(1.06)}
+.lb-prev:disabled, .lb-next:disabled{opacity:.3;cursor:not-allowed}
+.lb-stage{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:60px 80px 20px;overflow:hidden;
+}
+.lb-stage img, .lb-stage video{
+  max-width:100%;max-height:100%;object-fit:contain;
+  border-radius:8px;box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:lbIn .25s ease-out;
+}
+@keyframes lbIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.lb-foot{
+  padding:18px 24px 24px;color:#fff;
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+}
+.lb-meta{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;justify-content:center}
+.lb-title{font-size:17px;font-weight:700;letter-spacing:-0.01em}
+.lb-counter{font-size:13px;color:#9DB7DA;font-weight:600;letter-spacing:.04em}
+.lb-thumbs{
+  display:flex;gap:8px;overflow-x:auto;max-width:100%;padding:4px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent;
+}
+.lb-thumbs::-webkit-scrollbar{height:6px}
+.lb-thumbs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px}
+.lb-thumb{
+  flex-shrink:0;width:64px;height:48px;border-radius:6px;overflow:hidden;
+  cursor:pointer;opacity:.55;transition:all .15s;
+  border:2px solid transparent;background:#0E2A4D;
+}
+.lb-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.lb-thumb .video-mark{
+  position:absolute;inset:0;display:grid;place-items:center;color:#fff;
+}
+.lb-thumb:hover{opacity:.85}
+.lb-thumb.active{opacity:1;border-color:var(--tc-cyan)}
+@media (max-width:680px){
+  .lb-stage{padding:60px 12px 8px}
+  .lb-prev{left:6px}
+  .lb-next{right:6px}
+}
+
+/* ---------- Footer ---------- */
+footer.foot{
+  margin-top:80px;padding:48px 0 36px;background:var(--tc-navy-3);color:#cdd9ea;
+}
+footer.foot .foot-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;align-items:flex-start}
+footer.foot h5{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9DB7DA;margin:0 0 14px}
+footer.foot a{color:#cdd9ea;font-size:14px;display:block;padding:6px 0}
+footer.foot a:hover{color:var(--tc-cyan)}
+footer.foot .brand-block{font-family:'Manrope',sans-serif;font-size:22px;color:#fff;letter-spacing:-0.02em;font-weight:700}
+footer.foot .brand-block em{font-style:normal;color:var(--tc-cyan)}
+footer.foot .copy{margin-top:32px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#7d92b3;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+
+/* ---------- Reveal animation ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease, transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1080px){
+  .services{grid-template-columns:repeat(2,1fr)}
+  .process{grid-template-columns:1fr}
+  .sharing{grid-template-columns:1fr;padding:44px}
+  .masonry{column-count:3}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .stat{border-bottom:1px solid var(--line-soft)}
+  .stat:nth-child(odd){border-right:1px solid var(--line-soft)}
+  .stat:nth-child(even){border-right:0}
+  .hero-inner{grid-template-columns:1fr;padding:54px 0 64px}
+  .hero-shape{display:none}
+  .foot-inner{grid-template-columns:1fr}
+}
+@media (max-width:680px){
+  .wrap{padding:0 18px}
+  .nav{display:none}
+  .services{grid-template-columns:1fr}
+  .masonry{column-count:2}
+  .sharing{padding:32px 22px;border-radius:22px}
+  section.block{padding:56px 0}
+  .ann-card{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== TOP BAR ==================== -->
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#top">
+      <div class="logo"></div>
+      <div>
+        <div>TrueCommerce</div>
+      </div>
+      <div class="sep"></div>
+      <div class="label"><b>Vietnam Office</b> · People Site</div>
+    </a>
+    <nav class="nav">
+      <a href="#services" class="active">Services</a>
+      <a href="#sharing">30-Min Sharing</a>
+      <a href="#engagements">Activities</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="btn-help" href="#contact">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Ask HR
+    </a>
+  </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="top">
+  <div class="hero-grid-bg"></div>
+  <div class="wrap hero-inner">
+    <div>
+      <span class="eyebrow">Vietnam Office · People Site</span>
+      <h1>Vietnam Employee's<br/><span class="accent">Self-Services.</span></h1>
+      <p class="sub">Welcome 👋 Your home for office requests, HR processes, sharing sessions, and team activities at TrueCommerce Vietnam.</p>
+      <p class="vn">Cổng dịch vụ nội bộ dành cho nhân viên văn phòng TrueCommerce Việt Nam.</p>
+    </div>
+    <div class="hero-collage" aria-hidden="true">
+      <div class="hc-center">
+        <div class="hc-center-inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hc-tile hc-1">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+        <div><div class="ttl">Office Supplies</div><div class="sub">Stationery & access</div></div>
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
+      </div>
+      <div class="hc-tile hc-2">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c-.5-1-1.7-1.5-3-1.5s-2.5.7-2.5 2 1 1.7 2.5 2 3 .7 3 2-1.2 2-2.5 2-2.5-.5-3-1.5"/></svg></div>
+        <div><div class="ttl">Salary Advance</div><div class="sub">Reviewed weekly</div></div>
+      </div>
+      <div class="hc-tile hc-3">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <div><div class="ttl">30-Min Sharing</div><div class="sub">Talk to HR</div></div>
+      </div>
+      <div class="hc-tile hc-4">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5 17.5c.5-2 2-3 4-3s3.5 1 4 3M14 9h5M14 13h4"/></svg></div>
+        <div><div class="ttl">Employee ID</div><div class="sub">Reissue card</div></div>
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== STATS STRIP ==================== -->
+<div class="wrap stats reveal">
+  <div class="stats-inner">
+    <!--
+      Quick-info strip. The Reception card lists 2 phone numbers; Next holiday,
+      Birthdays this week and New joiners this month auto-compute from the
+      team list at the bottom of this file. Update the team list as people
+      join or leave.
+    -->
+    <div class="stat">
+      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <div class="sc">
+        <div class="k">Reception</div>
+        <div class="v"><a href="tel:+84899933866">0899 933 866</a></div>
+        <div class="d"><a href="tel:+842835473000" style="color:inherit">028 3547 3000</a> · Front desk, Floor 5</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <div class="sc">
+        <div class="k">Next public holiday</div>
+        <div class="v" id="nextHoliday">—</div>
+        <div class="d" id="nextHolidayName">Loading…</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 12v8H4v-8M22 7H2v5h20V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+      <div class="sc">
+        <div class="k">Birthdays this week</div>
+        <div class="v" id="bdayCount">—</div>
+        <div class="d" id="bdayNames">Loading…</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"/></svg></div>
+      <div class="sc">
+        <div class="k">New joiners this month</div>
+        <div class="v" id="joinerCount">—</div>
+        <div class="d" id="joinerNames">Loading…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ANNOUNCEMENTS REMOVED ==================== -->
+
+<!-- ==================== SECTION ANCHOR NAV ==================== -->
+<div class="anchor-nav">
+  <div class="wrap">
+    <div class="anchor-nav-inner">
+      <a href="#processes"><span class="n">1</span> Process Overview</a>
+      <a href="#services"><span class="n">2</span> Request Services</a>
+      <a href="#sharing"><span class="n">3</span> 30-Min Sharing</a>
+      <a href="#engagements"><span class="n">4</span> 2025 Activities</a>
+      <a href="#contact"><span class="n">5</span> Contact</a>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PROCESS & ONLINE COURSE ==================== -->
+<section class="block" id="processes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Process overview</span>
+      <h2>The Vietnam office handbook, <span class="accent">in one deck.</span></h2>
+      <p class="vn">Quy trình nội bộ giải quyết thủ tục hành chính</p>
+      <p>Kindly review the Vietnam office's process as presented in the bilingual slide below. English version is from slide 14–27.</p>
+    </div>
+
+    <div class="slide-deck reveal">
+      <div class="sd-head">
+        <span class="tag">Bilingual deck · 27 slides</span>
+        <div class="actions">
+          <a class="btn btn-primary" href="#" data-link="online-course" style="padding:10px 16px;font-size:13px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 3l14 9-14 9V3z"/></svg>
+            Open online course
+          </a>
+        </div>
+      </div>
+
+      <div class="sv-stage" id="slideStage">
+        <button class="sv-prev" aria-label="Previous slide" id="svPrev">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="sv-next" aria-label="Next slide" id="svNext">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
+        <div class="sv-track" id="svTrack">
+
+          <!-- ============================================================
+               SLIDE 1 — Cover
+               To replace with a real image, swap the placeholder content
+               inside <div class="sv-slide"> with:
+                 <img src="slides/01.png" alt="Slide 1" />
+               You can duplicate <div class="sv-slide"> blocks to add more.
+          ============================================================ -->
+          <div class="sv-slide">
+            <span class="ring1"></span>
+            <span class="ring2"></span>
+            <div class="sd-logo">Tru<span class="e">e</span>Commerce</div>
+            <h3 class="sd-title">QUY TRÌNH NỘI BỘ<br/>GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH</h3>
+            <div class="sd-sub">Tháng 03/2025</div>
+          </div>
+
+          <!-- SLIDE 2 — Agenda VN -->
+          <div class="sv-slide is-content">
+            <div class="sd-eyebrow">Mục lục · Phần Tiếng Việt (slide 2–13)</div>
+            <h4>Nội dung chính</h4>
+            <ol>
+              <li>Đăng ký Office Supplies</li>
+              <li>Sử dụng Taxi Card</li>
+              <li>Cấp lại Employee ID Card</li>
+              <li>Đổi vị trí chỗ ngồi (Seat ID Change)</li>
+              <li>Ứng lương (Salary Advance)</li>
+              <li>Tiền ăn OT (OT Meal Allowance)</li>
+              <li>Tạm ứng chi phí CLB (Sport Club Fee)</li>
+              <li>Báo sự cố văn phòng (Office Issue Report)</li>
+            </ol>
+          </div>
+
+          <!-- SLIDE 3 — Office Supplies -->
+          <div class="sv-slide is-content">
+            <div class="sd-eyebrow">01 · Office Supplies</div>
+            <h4>Đăng ký đồ dùng văn phòng phẩm</h4>
+            <ul>
+              <li>Stationery / Đồ dùng văn phòng</li>
+              <li>T-shirt, lanyard / Áo công ty, thẻ đeo</li>
+              <li>Locker key / Chìa khóa tủ</li>
+              <li>Receive letter / Nhận thư</li>
+            </ul>
+          </div>
+
+          <!-- SLIDE 4 — EN cover (slide 14) -->
+          <div class="sv-slide">
+            <span class="ring1"></span>
+            <span class="ring2"></span>
+            <div class="sd-logo">Tru<span class="e">e</span>Commerce</div>
+            <h3 class="sd-title">VIETNAM OFFICE<br/>INTERNAL ADMIN PROCESS</h3>
+            <div class="sd-sub">English version · Slides 14 → 27</div>
+          </div>
+
+          <!-- SLIDE 5 — EN content sample -->
+          <div class="sv-slide is-content">
+            <div class="sd-eyebrow">EN · Process overview</div>
+            <h4>How to request a service</h4>
+            <ol>
+              <li>Find your service in the Request panel below</li>
+              <li>Open the form via the Request button</li>
+              <li>Fill in the required details &amp; submit</li>
+              <li>Get a response from People team within SLA</li>
+            </ol>
+          </div>
+
+          <!-- TODO: add more <div class="sv-slide"> blocks for slides 6–27.
+               You can paste an <img src="slides/NN.png" alt="..." /> inside each block. -->
+
+        </div>
+      </div>
+
+      <div class="sd-foot">
+        <div class="sv-counter"><b id="svCurrent">1</b> / <span id="svTotal">5</span></div>
+        <div class="sv-dots" id="svDots"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SERVICES GRID ==================== -->
+<section class="block" id="services" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Request services</span>
+      <h2>Pick a service, <span class="accent">get it done.</span></h2>
+      <p>Eight self-service requests — fill the form, get a response within SLA.</p>
+    </div>
+
+    <div class="services">
+
+      <article class="svc c-cyan reveal" id="office-supplies">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+        <h3>Office Supplies</h3>
+        <div class="vn">Đồ dùng văn phòng phẩm</div>
+        <p>Stationery, T-shirt, lanyard, locker key, receive letter.</p>
+        <div class="foot">
+          <span class="sla">Instant</span>
+          <a class="svc-btn" href="#" data-link="office-supplies-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="svc c-blue reveal" id="taxi-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h2M11 15h6"/></svg></div>
+        <h3>Taxi Card</h3>
+        <div class="vn">Dùng thẻ taxi công ty</div>
+        <p>For company business travel. Return after each trip.</p>
+        <div class="foot">
+          <span class="sla">&lt; 24h</span>
+          <a class="svc-btn" href="#" data-link="taxi-card-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="svc c-navy reveal" id="employee-id">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5 17.5c.5-2 2-3 4-3s3.5 1 4 3M14 9h5M14 13h4"/></svg></div>
+        <h3>Employee ID</h3>
+        <div class="vn">Cấp lại thẻ nhân viên</div>
+        <p>Reissue your employee ID if lost or damaged.</p>
+        <div class="foot">
+          <span class="sla">&lt; 24h</span>
+          <a class="svc-btn" href="#" data-link="employee-id-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="svc c-violet reveal" id="seat-id">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19v-7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7"/><path d="M2 19h20M9 9V5a3 3 0 0 1 6 0v4"/></svg></div>
+        <h3>Seat ID Change</h3>
+        <div class="vn">Đổi vị trí chỗ ngồi</div>
+        <p>Requires approval from your Department Head.</p>
+        <div class="foot">
+          <span class="sla">&lt; 24h</span>
+          <a class="svc-btn" href="#" data-link="seat-id-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="svc c-coral reveal" id="office-issue">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+        <h3>Office Issue Report</h3>
+        <div class="vn">Báo sự cố văn phòng</div>
+        <p>AC, lighting, plumbing, equipment — we'll resolve ASAP.</p>
+        <div class="foot">
+          <span class="sla">ASAP</span>
+          <a class="svc-btn" href="#" data-link="office-issue-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="svc c-gold reveal" id="salary-advance">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c-.5-1-1.7-1.5-3-1.5s-2.5.7-2.5 2 1 1.7 2.5 2 3 .7 3 2-1.2 2-2.5 2-2.5-.5-3-1.5"/></svg></div>
+        <h3>Salary Advance</h3>
+        <div class="vn">Ứng lương</div>
+        <p>Review the regulations carefully before submitting.</p>
+        <div class="foot">
+          <span class="sla">Policy applies</span>
+          <a class="svc-btn" href="#" data-link="salary-advance-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="svc c-teal reveal" id="ot-meal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v6a3 3 0 0 0 3 3v11M9 2v9M3 2v9M18 2v20M21 5v9a3 3 0 0 1-3 3"/></svg></div>
+        <h3>OT Meal Allowance</h3>
+        <div class="vn">Tiền ăn OT</div>
+        <p>Submit within the same week of the overtime work.</p>
+        <div class="foot">
+          <span class="sla">Weekly</span>
+          <a class="svc-btn" href="#" data-link="ot-meal-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="svc c-green reveal" id="sport-club">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg></div>
+        <h3>Sport Club Fee</h3>
+        <div class="vn">Tạm ứng chi phí CLB</div>
+        <p>Only for sport club leaders. Monthly workflow.</p>
+        <div class="foot">
+          <span class="sla">Leaders only</span>
+          <a class="svc-btn" href="#" data-link="sport-club-form">Request <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 30-MIN SHARING ==================== -->
+<section class="block" id="sharing" style="padding-top:0">
+  <div class="wrap">
+    <div class="sharing reveal">
+      <div>
+        <span class="eyebrow" style="color:var(--tc-coral)">Well-being · Confidential</span>
+        <h2>30-Min <span class="accent">Sharing</span> Service</h2>
+        <p class="lead">
+          Feeling stuck at work? Your voice matters, and we are here to support you. Just 30 minutes, one appointment, one listener — no judgment, completely confidential.
+          <span class="vn">Cảm thấy bế tắc trong công việc? Bọn mình luôn sẵn sàng lắng nghe — hoàn toàn bảo mật.</span>
+        </p>
+        <div class="quote">Just 30 minutes, one appointment, one listener. No judgment, completely confidential.</div>
+
+        <div class="contacts">
+          <div class="contact">
+            <div class="av qv">QV</div>
+            <div>
+              <div class="name">Quynh Vo</div>
+              <div class="role">HR Business Partner</div>
+            </div>
+          </div>
+          <div class="contact">
+            <div class="av nt">NT</div>
+            <div>
+              <div class="name">Nghi Tran</div>
+              <div class="role">Talent Acquisition Spec.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn-primary" style="background:var(--tc-coral);color:#fff;box-shadow:0 8px 22px rgba(255,107,74,.35)" href="#" data-link="coffee-with-us">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+            Coffee with us
+          </a>
+          <a class="btn" style="background:#fff;color:var(--tc-navy);border:1px solid var(--line)" href="#" data-link="learn-more">
+            Learn more →
+          </a>
+        </div>
+      </div>
+
+      <div class="sharing-right">
+        <div class="video-bg"></div>
+        <div class="video-frame">
+          <div class="video-card">
+            <div class="play" data-video="30min-instruction">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="title">30-Min Sharing<br/>Service · Instruction</div>
+            <div class="sub">Watch how it works — 1 min 38 sec</div>
+          </div>
+        </div>
+        <div class="video-meta">
+          <span>Confidential</span>
+          <span>One-on-one</span>
+          <span>EN / VN</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ENGAGEMENTS GALLERY ==================== -->
+<section class="block" id="engagements" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal" style="max-width:none">
+      <div class="gallery-head">
+        <div>
+          <span class="eyebrow" style="color:var(--tc-coral)">Office life</span>
+          <h2>The year in <span class="accent">moments.</span></h2>
+          <p class="vn">Engagement activities at Vietnam office.</p>
+        </div>
+        <div class="filters" id="filters"></div>
+      </div>
+    </div>
+
+    <div class="masonry" id="masonry"></div>
+    <div class="gallery-empty" id="galleryEmpty" style="display:none">
+      <div class="ge-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      </div>
+      <h3>No events yet for this year</h3>
+      <p>End-users can add a new event by uploading a folder to the repo.<br/>See README for instructions.</p>
+    </div>
+    <div class="gallery-loading" id="galleryLoading">
+      <div class="gl-spinner"></div>
+      <p>Loading the year in moments…</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="foot" id="contact">
+  <div class="wrap foot-inner">
+    <div>
+      <div class="brand-block">TrueCommerce · Vietnam Office</div>
+      <p style="margin-top:14px;font-size:14px;max-width:420px;color:#9DB7DA;line-height:1.6">
+        Floor 5, Helios Building, Street No. 3, Lot No. 6, Quang Trung Software City (QTSC), Trung My Tay Ward, Ho Chi Minh City, 71507
+      </p>
+    </div>
+    <div>
+      <h5>Quick services</h5>
+      <a href="#office-supplies">Office Supplies</a>
+      <a href="#taxi-card">Taxi Card</a>
+      <a href="#employee-id">Employee ID</a>
+      <a href="#salary-advance">Salary Advance</a>
+      <a href="#ot-meal">OT Meal Allowance</a>
+    </div>
+    <div>
+      <h5>Resources & contact</h5>
+      <a href="#processes">Process slide deck</a>
+      <a href="#" data-link="online-course">Online course</a>
+      <a href="#sharing">30-Min Sharing</a>
+      <a href="#engagements">2025 Activities</a>
+      <a href="#" data-link="contact-hr">Contact HR</a>
+    </div>
+  </div>
+  <div class="wrap copy">
+    <div>© 2026 TrueCommerce · Vietnam Office People Site</div>
+    <div>v2.0 · Last updated 03/2025</div>
+  </div>
+</footer>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Close">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <button class="lb-prev" id="lbPrev" aria-label="Previous image">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="lb-next" id="lbNext" aria-label="Next image">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <div class="lb-stage" id="lbStage"></div>
+  <div class="lb-foot">
+    <div class="lb-meta">
+      <div class="lb-title" id="lbTitle">—</div>
+      <div class="lb-counter" id="lbCounter">1 / 1</div>
+    </div>
+    <div class="lb-thumbs" id="lbThumbs"></div>
+  </div>
+</div>
+
+<script>
+// ---------- Reveal on scroll ----------
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in') });
+}, { threshold:.08, rootMargin:'0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// ---------- Anchor nav active state ----------
+const sections = ['processes','services','sharing','engagements'].map(id => document.getElementById(id)).filter(Boolean);
+const navLinks = document.querySelectorAll('.nav a, .anchor-nav a');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY + 140;
+  let cur = sections[0]?.id;
+  for(const s of sections){ if(s && s.offsetTop <= y) cur = s.id; }
+  navLinks.forEach(a => {
+    const h = a.getAttribute('href');
+    if(h && h.startsWith('#')) a.classList.toggle('active', h === '#'+cur);
+  });
+}, { passive:true });
+
+// ---------- Gallery: fetch events from GitHub repo ----------
+// =========================================================================
+//  CONFIG — edit these two lines once after creating your GitHub repo.
+//  The page will list folders under `events/` in this repo, parse the
+//  folder name "YYYY-MM Title…" and build the gallery automatically.
+// =========================================================================
+const GITHUB_USER   = 'YOUR_GITHUB_USER';   // ← e.g. 'quynh-tc'
+const GITHUB_REPO   = 'YOUR_GITHUB_REPO';   // ← e.g. 'vn-office-page'
+const GITHUB_BRANCH = 'main';
+const EVENTS_PATH   = 'events';
+const CACHE_TTL_MS  = 60 * 60 * 1000;  // 1 hour client-side cache
+
+(async () => {
+  const masonry  = document.getElementById('masonry');
+  const filters  = document.getElementById('filters');
+  const loading  = document.getElementById('galleryLoading');
+  const empty    = document.getElementById('galleryEmpty');
+  if(!masonry) return;
+
+  const isImg   = n => /\.(jpe?g|png|webp|gif|avif)$/i.test(n);
+  const isVideo = n => /\.(mp4|mov|webm|m4v)$/i.test(n);
+  const isCover = n => /^cover\.(jpe?g|png|webp)$/i.test(n);
+
+  const parseFolderName = (name) => {
+    // "2026-05 Happy Hour"  or  "2026-05-happy-hour"
+    const m = name.match(/^(\d{4})[-_\s]?(\d{2})?[-_\s]+(.+)$/);
+    if(m){
+      return {
+        year: parseInt(m[1], 10),
+        month: m[2] ? parseInt(m[2], 10) : 0,
+        title: m[3].replace(/[-_]+/g, ' ').replace(/\s+/g,' ').trim(),
+      };
+    }
+    const ym = name.match(/(\d{4})/);
+    return {
+      year: ym ? parseInt(ym[1], 10) : new Date().getFullYear(),
+      month: 0,
+      title: name.replace(/[-_]+/g, ' ').trim(),
+    };
+  };
+
+  const raw = (path) => `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${path}`;
+  const api = (path) => `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`;
+
+  async function fetchEvents(){
+    const cacheKey = `tc-events-${GITHUB_USER}-${GITHUB_REPO}`;
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if(cached && Date.now() - cached.t < CACHE_TTL_MS) return cached.d;
+    } catch {}
+    if(GITHUB_USER === 'YOUR_GITHUB_USER') return [];
+    const r = await fetch(api(EVENTS_PATH));
+    if(!r.ok) throw new Error('Failed to list events folder (HTTP ' + r.status + '). Is the repo public?');
+    const folders = (await r.json()).filter(e => e.type === 'dir');
+    const events = await Promise.all(folders.map(async (f) => {
+      const meta = parseFolderName(f.name);
+      const r2 = await fetch(api(`${EVENTS_PATH}/${f.name}`));
+      if(!r2.ok) return null;
+      const files = (await r2.json()).filter(x => x.type === 'file');
+      const images = files.filter(x => isImg(x.name)).map(x => x.name).sort();
+      const cover  = files.find(x => isCover(x.name))?.name || images[0];
+      const video  = files.find(x => isVideo(x.name))?.name || null;
+      if(!images.length && !video) return null;
+      return { folder: f.name, path: `${EVENTS_PATH}/${f.name}`, ...meta, images, cover, video };
+    }));
+    const out = events.filter(Boolean);
+    try { localStorage.setItem(cacheKey, JSON.stringify({ t: Date.now(), d: out })); } catch {}
+    return out;
+  }
+
+  // varied tile heights for masonry rhythm
+  const ASPECTS = ['h-m','h-l','h-s','h-m','h-xl','h-s','h-l','h-m'];
+
+  let allEvents = [];
+  function render(year){
+    masonry.innerHTML = '';
+    const list = allEvents.filter(e => e.year === year);
+    if(!list.length){ empty.style.display = ''; return; }
+    empty.style.display = 'none';
+    list.sort((a,b) => b.month - a.month);
+    list.forEach((ev, i) => {
+      const tile = document.createElement('div');
+      tile.className = `tile ${ASPECTS[i % ASPECTS.length]} reveal in${ev.video ? ' has-video' : ''}`;
+      const coverUrl = ev.cover ? raw(`${ev.path}/${ev.cover}`) : '';
+      const total = (ev.images?.length || 0) + (ev.video ? 1 : 0);
+      tile.innerHTML = `
+        <div class="ph">
+          ${coverUrl ? `<img src="${coverUrl}" alt="${ev.title}" loading="lazy" />` : ''}
+          <div class="grad"></div>
+          ${ev.video ? `<div class="video-pill"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>` : ''}
+          ${total > 1 ? `<div class="count-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>${total}</div>` : ''}
+          <div class="label"><div class="ttl">${ev.title}</div></div>
+        </div>`;
+      tile.addEventListener('click', () => openLightbox(ev));
+      masonry.appendChild(tile);
+    });
+  }
+
+  function buildYearFilter(){
+    if(!allEvents.length){ filters.innerHTML = ''; return null; }
+    const counts = {};
+    allEvents.forEach(e => { counts[e.year] = (counts[e.year]||0) + 1; });
+    const years = Object.keys(counts).map(Number).sort((a,b) => b - a);
+    const cur = new Date().getFullYear();
+    const def = years.includes(cur) ? cur : years[0];
+    filters.innerHTML = '';
+    years.forEach(y => {
+      const b = document.createElement('button');
+      b.dataset.year = String(y);
+      b.textContent = String(y);
+      if(y === def) b.classList.add('active');
+      b.addEventListener('click', () => {
+        [...filters.children].forEach(x => x.classList.toggle('active', x === b));
+        render(y);
+      });
+      filters.appendChild(b);
+    });
+    return def;
+  }
+
+  // ---------- Lightbox slideshow ----------
+  const lb        = document.getElementById('lightbox');
+  const lbStage   = document.getElementById('lbStage');
+  const lbTitle   = document.getElementById('lbTitle');
+  const lbCounter = document.getElementById('lbCounter');
+  const lbThumbs  = document.getElementById('lbThumbs');
+  const lbPrev    = document.getElementById('lbPrev');
+  const lbNext    = document.getElementById('lbNext');
+  const lbClose   = document.getElementById('lbClose');
+  let lbItems = [], lbIdx = 0, lbEvent = null;
+
+  function openLightbox(ev){
+    lbEvent = ev; lbItems = [];
+    (ev.images || []).forEach(name => lbItems.push({ type:'image', url: raw(`${ev.path}/${name}`) }));
+    if(ev.video) lbItems.push({ type:'video', url: raw(`${ev.path}/${ev.video}`) });
+    if(!lbItems.length) return;
+    lbIdx = 0; renderLightbox();
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox(){
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    lbStage.innerHTML = '';
+  }
+  function renderLightbox(){
+    const it = lbItems[lbIdx];
+    lbStage.innerHTML = '';
+    if(it.type === 'image'){
+      const img = document.createElement('img');
+      img.src = it.url; img.alt = lbEvent.title;
+      lbStage.appendChild(img);
+    } else {
+      const v = document.createElement('video');
+      v.src = it.url; v.controls = true; v.autoplay = true;
+      lbStage.appendChild(v);
+    }
+    lbTitle.textContent = lbEvent.title;
+    lbCounter.textContent = `${lbIdx + 1} / ${lbItems.length}`;
+    lbPrev.disabled = lbIdx === 0;
+    lbNext.disabled = lbIdx === lbItems.length - 1;
+    lbThumbs.innerHTML = '';
+    lbItems.forEach((it2, i) => {
+      const t = document.createElement('button');
+      t.className = 'lb-thumb' + (i === lbIdx ? ' active' : '');
+      if(it2.type === 'image'){
+        const img = document.createElement('img');
+        img.src = it2.url; img.loading = 'lazy';
+        t.appendChild(img);
+      } else {
+        t.innerHTML = `<div class="video-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>`;
+      }
+      t.addEventListener('click', () => { lbIdx = i; renderLightbox(); });
+      lbThumbs.appendChild(t);
+    });
+    requestAnimationFrame(() => {
+      const active = lbThumbs.querySelector('.lb-thumb.active');
+      if(active) active.scrollIntoView({ inline:'center', block:'nearest', behavior:'smooth' });
+    });
+  }
+  lbPrev.addEventListener('click', () => { if(lbIdx > 0){ lbIdx--; renderLightbox(); } });
+  lbNext.addEventListener('click', () => { if(lbIdx < lbItems.length - 1){ lbIdx++; renderLightbox(); } });
+  lbClose.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', e => { if(e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if(!lb.classList.contains('open')) return;
+    if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'ArrowLeft' && lbIdx > 0){ lbIdx--; renderLightbox(); }
+    if(e.key === 'ArrowRight' && lbIdx < lbItems.length - 1){ lbIdx++; renderLightbox(); }
+  });
+
+  // ---- boot ----
+  try { allEvents = await fetchEvents(); }
+  catch (err) { console.error('Gallery fetch failed:', err); allEvents = []; }
+  loading.style.display = 'none';
+  if(!allEvents.length){ filters.innerHTML = ''; empty.style.display = ''; return; }
+  const def = buildYearFilter();
+  render(def);
+})();
+
+// ---------- Team list (edit me) ----------
+// Used to auto-compute "Birthdays this week" and "New joiners this month".
+// birthday: 'MM-DD'   joinDate: 'YYYY-MM-DD'
+const TEAM = [
+  { name: 'Quynh Vo',       birthday: '05-27', joinDate: '2023-04-01' },
+  { name: 'Nghi Tran',      birthday: '11-28', joinDate: '2024-08-12' },
+  { name: 'Gina Nguyen',    birthday: '03-14', joinDate: '2022-06-15' },
+  { name: 'Minh Pham',      birthday: '05-29', joinDate: '2026-05-04' },
+  { name: 'Hoa Le',         birthday: '07-09', joinDate: '2026-05-12' },
+  { name: 'Tuan Dang',      birthday: '01-22', joinDate: '2025-09-02' },
+  { name: 'Linh Hoang',     birthday: '05-31', joinDate: '2024-02-19' },
+  { name: 'An Phan',        birthday: '10-04', joinDate: '2026-05-20' },
+  { name: 'Khoa Bui',       birthday: '08-17', joinDate: '2023-11-06' },
+  { name: 'Duy Vu',         birthday: '06-08', joinDate: '2024-04-22' },
+  { name: 'Trang Do',       birthday: '12-30', joinDate: '2025-01-10' },
+  { name: 'Phuc Nguyen',    birthday: '02-11', joinDate: '2024-10-08' },
+];
+
+// ---------- Birthdays this week ----------
+(() => {
+  const cEl = document.getElementById('bdayCount');
+  const nEl = document.getElementById('bdayNames');
+  if(!cEl || !nEl) return;
+  const today = new Date();
+  // current ISO week: Mon -> Sun
+  const day = today.getDay(); // 0=Sun..6=Sat
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const monday = new Date(today); monday.setDate(today.getDate() + mondayOffset); monday.setHours(0,0,0,0);
+  const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); sunday.setHours(23,59,59,999);
+
+  const inThisWeek = (mmdd) => {
+    if(!mmdd) return false;
+    const [m, d] = mmdd.split('-').map(Number);
+    // try this year, plus year+1 for end-of-year edge
+    for(const yr of [monday.getFullYear(), monday.getFullYear() + 1]){
+      const dt = new Date(yr, m - 1, d);
+      if(dt >= monday && dt <= sunday) return true;
+    }
+    return false;
+  };
+  const found = TEAM.filter(p => inThisWeek(p.birthday));
+  if(!found.length){
+    cEl.textContent = '0';
+    nEl.textContent = 'No birthdays this week';
+    return;
+  }
+  cEl.textContent = String(found.length);
+  const names = found.map(p => p.name);
+  const max = 3;
+  nEl.textContent = names.length <= max
+    ? names.join(', ')
+    : names.slice(0, max).join(', ') + ` +${names.length - max} more`;
+})();
+
+// ---------- New joiners this month ----------
+(() => {
+  const cEl = document.getElementById('joinerCount');
+  const nEl = document.getElementById('joinerNames');
+  if(!cEl || !nEl) return;
+  const today = new Date();
+  const y = today.getFullYear(), m = today.getMonth();
+  const found = TEAM.filter(p => {
+    if(!p.joinDate) return false;
+    const d = new Date(p.joinDate);
+    return d.getFullYear() === y && d.getMonth() === m;
+  });
+  if(!found.length){
+    cEl.textContent = '0';
+    nEl.textContent = 'No new joiners yet this month';
+    return;
+  }
+  cEl.textContent = String(found.length);
+  const names = found.map(p => p.name);
+  const max = 3;
+  nEl.textContent = names.length <= max
+    ? names.join(', ')
+    : names.slice(0, max).join(', ') + ` +${names.length - max} more`;
+})();
+
+// ---------- Next public holiday (VN) ----------
+(() => {
+  // Edit this list yearly. Lunar holidays differ each year — keep them updated.
+  // Format: 'YYYY-MM-DD'  (use the first day for multi-day breaks)
+  const holidays = [
+    { date: '2026-01-01', name: "New Year's Day · Tết Dương Lịch" },
+    { date: '2026-02-16', name: 'Tết Nguyên Đán · Lunar New Year (Tết Bính Ngọ)' },
+    { date: '2026-04-26', name: 'Hùng Kings Festival · Giỗ Tổ Hùng Vương' },
+    { date: '2026-04-30', name: 'Reunification Day · Ngày Giải Phóng' },
+    { date: '2026-05-01', name: 'International Labour Day · Quốc tế Lao động' },
+    { date: '2026-09-02', name: 'National Day · Quốc Khánh' },
+    { date: '2027-01-01', name: "New Year's Day · Tết Dương Lịch" },
+  ];
+  const v = document.getElementById('nextHoliday');
+  const n = document.getElementById('nextHolidayName');
+  if(!v || !n) return;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const upcoming = holidays
+    .map(h => ({ ...h, d: new Date(h.date) }))
+    .filter(h => h.d >= today)
+    .sort((a,b) => a.d - b.d)[0];
+  if(!upcoming){
+    v.textContent = '—';
+    n.textContent = 'Update holiday list';
+    return;
+  }
+  const diff = Math.ceil((upcoming.d - today) / 86400000);
+  const fmt = upcoming.d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  v.textContent = fmt;
+  n.textContent = `${upcoming.name} · in ${diff} day${diff===1?'':'s'}`;
+})();
+
+// ---------- Slide carousel ----------
+(() => {
+  const track = document.getElementById('svTrack');
+  if(!track) return;
+  const slides = [...track.querySelectorAll('.sv-slide')];
+  const prev = document.getElementById('svPrev');
+  const next = document.getElementById('svNext');
+  const counter = document.getElementById('svCurrent');
+  const totalEl = document.getElementById('svTotal');
+  const dotsEl = document.getElementById('svDots');
+  let idx = 0;
+  totalEl.textContent = slides.length;
+
+  // build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'sv-dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', `Go to slide ${i+1}`);
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+  const dots = [...dotsEl.children];
+
+  function go(i){
+    idx = Math.max(0, Math.min(slides.length - 1, i));
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    counter.textContent = idx + 1;
+    dots.forEach((d, di) => d.classList.toggle('active', di === idx));
+    prev.disabled = idx === 0;
+    next.disabled = idx === slides.length - 1;
+  }
+  prev.addEventListener('click', () => go(idx - 1));
+  next.addEventListener('click', () => go(idx + 1));
+  document.addEventListener('keydown', (e) => {
+    // only react when carousel is in viewport
+    const r = track.getBoundingClientRect();
+    if(r.bottom < 0 || r.top > window.innerHeight) return;
+    if(e.key === 'ArrowLeft') go(idx - 1);
+    if(e.key === 'ArrowRight') go(idx + 1);
+  });
+  go(0);
+})();
+
+// ---------- CTA placeholder behavior ----------
+document.querySelectorAll('[data-link]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    if(a.getAttribute('href') === '#'){
+      e.preventDefault();
+      const key = a.getAttribute('data-link');
+      console.log('Link placeholder:', key, '— replace href with the real form URL.');
+    }
+  });
+});
+</script>
+
+<template id="__bundler_thumbnail" data-bg-color="#002A57">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#002A57"/>
+    <g transform="translate(600 400)">
+      <circle r="220" fill="none" stroke="#00B5E2" stroke-width="2" stroke-opacity="0.25"/>
+      <circle r="160" fill="none" stroke="#00B5E2" stroke-width="2" stroke-opacity="0.5"/>
+      <g transform="translate(-80 -80)" fill="#fff">
+        <rect x="0"   y="0"   width="70" height="70" rx="14"/>
+        <rect x="90"  y="0"   width="70" height="70" rx="14" fill="#00B5E2"/>
+        <rect x="0"   y="90"  width="70" height="70" rx="14" fill="#00B5E2"/>
+        <rect x="90"  y="90"  width="70" height="70" rx="14"/>
+      </g>
+    </g>
+  </svg>
+</template>
+
+</body>
+</html>

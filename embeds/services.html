@@ -128,7 +128,11 @@ const FORM_LINKS = {
 document.querySelectorAll('.svc-btn[data-link]').forEach(a => {
   const url = FORM_LINKS[a.dataset.link];
   if (url && url !== 'PASTE_LINK') {
-    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    a.href = url; a.rel = 'noopener';
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.top.open(url, '_blank', 'noopener');
+    });
   } else {
     a.classList.add('is-soon');
     a.innerHTML = 'Coming soon';

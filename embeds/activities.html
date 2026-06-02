@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="embed.css">
+<!-- MSAL for Microsoft login -->
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 </head>
 <body>
 <div class="embed-wrap embed-section">
@@ -59,62 +61,107 @@
 
 <script>
 // ============================================================
-//  CONFIG SharePoint
+//  CONFIG
 // ============================================================
-const SP_SITE    = 'vietnampeopleteam';
-const SP_HOST    = 'tcapc.sharepoint.com';
-const EVENT_PATH = '/sites/vietnampeopleteam/Shared Documents/8. People Experience/VN Office Page/Event Photo';
+const CLIENT_ID  = '266bfe30-80b7-44d8-9827-da61d7cfd3e9';
+const TENANT_ID  = 'tcapc.onmicrosoft.com'; // hoặc tenant ID dạng GUID
+const SITE_HOST  = 'tcapc.sharepoint.com';
+const SITE_PATH  = '/sites/vietnampeopleteam';
+const FOLDER_PATH = '8. People Experience/VN Office Page/Event Photo';
+
+const msalConfig = {
+  auth: {
+    clientId: CLIENT_ID,
+    authority: `https://login.microsoftonline.com/${TENANT_ID}`,
+    redirectUri: window.location.href.split('?')[0],
+  },
+  cache: { cacheLocation: 'sessionStorage' }
+};
+
+const loginRequest = {
+  scopes: ['https://tcapc.sharepoint.com/Sites.Read.All', 'https://tcapc.sharepoint.com/AllSites.Read']
+};
+
+const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+async function getToken() {
+  await msalInstance.initialize();
+  // Try silent first (already logged in)
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    try {
+      const res = await msalInstance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+      return res.accessToken;
+    } catch {}
+  }
+  // Popup login
+  const res = await msalInstance.acquireTokenPopup(loginRequest);
+  return res.accessToken;
+}
 
 const isImg   = n => /\.(jpe?g|png|webp|gif|avif)$/i.test(n);
 const isCover = n => /^cover\.(jpe?g|png|webp)$/i.test(n);
 
-// SharePoint REST API helpers
-const spApi = (path) =>
-  `https://${SP_HOST}/sites/${SP_SITE}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(path)}')/Folders?$select=Name,ServerRelativeUrl&$orderby=Name`;
-const spFiles = (path) =>
-  `https://${SP_HOST}/sites/${SP_SITE}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(path)}')/Files?$select=Name,ServerRelativeUrl`;
-const spImgUrl = (serverRelUrl) =>
-  `https://${SP_HOST}${serverRelUrl}`;
-
-async function spFetch(url) {
-  const r = await fetch(url, {
-    headers: { 'Accept': 'application/json;odata=verbose' },
-    credentials: 'include'
-  });
-  if (!r.ok) throw new Error('SharePoint fetch failed: ' + r.status);
-  const j = await r.json();
-  return j.d.results;
+async function graphFetch(url, token) {
+  const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) throw new Error('Graph fetch failed: ' + r.status + ' ' + url);
+  return r.json();
 }
 
-async function fetchEvents() {
-  // Get year folders (2025, 2026, ...)
-  const yearFolders = await spFetch(spApi(EVENT_PATH));
+async function fetchEvents(token) {
+  // Get site ID
+  const siteData = await graphFetch(
+    `https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}`,
+    token
+  );
+  const siteId = siteData.id;
+
+  // Get drive ID (Documents)
+  const drivesData = await graphFetch(
+    `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`,
+    token
+  );
+  const drive = drivesData.value.find(d => d.name === 'Documents') || drivesData.value[0];
+  const driveId = drive.id;
+
+  // Get Event Photo folder
+  const folderEncoded = encodeURIComponent(FOLDER_PATH);
+  const rootData = await graphFetch(
+    `https://graph.microsoft.com/v1.0/drives/${driveId}/root:/${FOLDER_PATH}:/children`,
+    token
+  );
+
   const events = [];
 
-  await Promise.all(yearFolders.map(async (yf) => {
-    const year = parseInt(yf.Name, 10);
-    if (isNaN(year)) return;
+  // Year folders (2025, 2026...)
+  const yearFolders = rootData.value.filter(i => i.folder && /^\d{4}$/.test(i.name));
 
-    // Get event folders inside each year
-    const eventFolders = await spFetch(spApi(yf.ServerRelativeUrl));
+  await Promise.all(yearFolders.map(async (yf) => {
+    const year = parseInt(yf.name, 10);
+    const yearData = await graphFetch(
+      `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${yf.id}/children`,
+      token
+    );
+    const eventFolders = yearData.value.filter(i => i.folder);
 
     await Promise.all(eventFolders.map(async (ef) => {
-      const title = ef.Name.replace(/^\d{4}[-_\s]*\d{0,2}[-_\s]*/,'').replace(/[-_]+/g,' ').trim() || ef.Name;
-
-      // Get files inside event folder
-      const files = await spFetch(spFiles(ef.ServerRelativeUrl));
-      const images = files.filter(f => isImg(f.Name));
+      const title = ef.name.replace(/^\d{4}[-_\s]*\d{0,2}[-_\s]*/,'').replace(/[-_]+/g,' ').trim() || ef.name;
+      const filesData = await graphFetch(
+        `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${ef.id}/children`,
+        token
+      );
+      const images = filesData.value.filter(f => f.file && isImg(f.name));
       if (!images.length) return;
 
-      const coverFile = images.find(f => isCover(f.Name)) || images[0];
-      const otherImages = images.filter(f => f.Name !== coverFile.Name);
-      const allImages = [coverFile, ...otherImages];
+      const coverFile = images.find(f => isCover(f.name)) || images[0];
+      const others    = images.filter(f => f.name !== coverFile.name);
+      const allImgs   = [coverFile, ...others];
 
       events.push({
         year,
         title,
-        cover: spImgUrl(coverFile.ServerRelativeUrl),
-        images: allImages.map(f => ({ url: spImgUrl(f.ServerRelativeUrl), name: f.Name })),
+        cover: coverFile['@microsoft.graph.downloadUrl'],
+        images: allImgs.map(f => ({ url: f['@microsoft.graph.downloadUrl'], name: f.name })),
       });
     }));
   }));
@@ -178,9 +225,7 @@ const lbClose   = document.getElementById('lbClose');
 let lbItems = [], lbIdx = 0, lbEvent = null;
 
 function openLightbox(ev) {
-  lbEvent = ev;
-  lbItems = ev.images;
-  lbIdx = 0;
+  lbEvent = ev; lbItems = ev.images; lbIdx = 0;
   renderLightbox();
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -196,12 +241,10 @@ function renderLightbox() {
   const img = document.createElement('img');
   img.src = it.url; img.alt = lbEvent.title;
   lbStage.appendChild(img);
-
   lbTitle.textContent = lbEvent.title;
   lbCounter.textContent = (lbIdx + 1) + ' / ' + lbItems.length;
   lbPrev.disabled = lbIdx === 0;
   lbNext.disabled = lbIdx === lbItems.length - 1;
-
   lbThumbs.innerHTML = '';
   lbItems.forEach((it2, i) => {
     const t = document.createElement('button');
@@ -231,23 +274,20 @@ document.addEventListener('keydown', e => {
   const empty   = document.getElementById('galleryEmpty');
   const filters = document.getElementById('filters');
   try {
-    allEvents = await fetchEvents();
+    const token = await getToken();
+    allEvents = await fetchEvents(token);
   } catch (err) {
-    console.error('SharePoint fetch failed:', err);
+    console.error('Failed:', err);
     loading.style.display = 'none';
     empty.style.display = '';
-    empty.querySelector('p').textContent = 'Could not load events. Make sure you are logged in to Microsoft 365.';
+    empty.querySelector('p').textContent = 'Could not load events. Please make sure you are logged in to Microsoft 365.';
     return;
   }
-
   loading.style.display = 'none';
-
   if (!allEvents.length) { filters.innerHTML = ''; empty.style.display = ''; return; }
-
   const years = [...new Set(allEvents.map(e => e.year))].sort((a,b) => b - a);
-  const defaultYear = years[0];
-  buildYearFilter(years, defaultYear);
-  render(defaultYear);
+  buildYearFilter(years, years[0]);
+  render(years[0]);
 })();
 </script>
 

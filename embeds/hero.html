@@ -39,7 +39,7 @@
       </div>
       <div class="hc-tile hc-1">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
-        <div><div class="ttl">Office Supplies</div><div class="sub">Stationery & access</div></div>
+        <div><div class="ttl">Office Supplies</div><div class="sub">Stationery &amp; access</div></div>
         <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
       </div>
       <div class="hc-tile hc-2">
@@ -58,125 +58,6 @@
     </div>
   </div>
 </section>
-
-<div class="embed-wrap stats">
-  <div class="stats-inner">
-    <div class="stat">
-      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-      <div class="sc">
-        <div class="k">Reception</div>
-        <div class="v"><a href="tel:+84899933866">0899 933 866</a></div>
-        <div class="d"><a href="tel:+842835473000" style="color:inherit">028 3547 3000</a> · Front desk, Floor 5</div>
-      </div>
-    </div>
-    <div class="stat">
-      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-      <div class="sc">
-        <div class="k">Next public holiday</div>
-        <div class="v" id="nextHoliday">—</div>
-        <div class="d" id="nextHolidayName">Loading…</div>
-      </div>
-    </div>
-    <div class="stat">
-      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 12v8H4v-8M22 7H2v5h20V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
-      <div class="sc">
-        <div class="k">Birthdays this week</div>
-        <div class="v" id="bdayCount">—</div>
-        <div class="d" id="bdayNames">Loading…</div>
-      </div>
-    </div>
-    <div class="stat">
-      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6"/></svg></div>
-      <div class="sc">
-        <div class="k">New joiners this month</div>
-        <div class="v" id="joinerCount">—</div>
-        <div class="d" id="joinerNames">Loading…</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-// ---------- Team list (edit me) ----------
-const TEAM = [
-  { name: 'Quynh Vo',       birthday: '05-27', joinDate: '2023-04-01' },
-  { name: 'Nghi Tran',      birthday: '11-28', joinDate: '2024-08-12' },
-  { name: 'Gina Nguyen',    birthday: '03-14', joinDate: '2022-06-15' },
-  { name: 'Minh Pham',      birthday: '05-29', joinDate: '2026-05-04' },
-  { name: 'Hoa Le',         birthday: '07-09', joinDate: '2026-05-12' },
-  { name: 'Tuan Dang',      birthday: '01-22', joinDate: '2025-09-02' },
-  { name: 'Linh Hoang',     birthday: '05-31', joinDate: '2024-02-19' },
-  { name: 'An Phan',        birthday: '10-04', joinDate: '2026-05-20' },
-  { name: 'Khoa Bui',       birthday: '08-17', joinDate: '2023-11-06' },
-  { name: 'Duy Vu',         birthday: '06-08', joinDate: '2024-04-22' },
-  { name: 'Trang Do',       birthday: '12-30', joinDate: '2025-01-10' },
-  { name: 'Phuc Nguyen',    birthday: '02-11', joinDate: '2024-10-08' },
-];
-
-// Birthdays this week
-(() => {
-  const cEl = document.getElementById('bdayCount');
-  const nEl = document.getElementById('bdayNames');
-  const today = new Date();
-  const day = today.getDay();
-  const mondayOffset = day === 0 ? -6 : 1 - day;
-  const monday = new Date(today); monday.setDate(today.getDate() + mondayOffset); monday.setHours(0,0,0,0);
-  const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); sunday.setHours(23,59,59,999);
-  const inThisWeek = (mmdd) => {
-    if(!mmdd) return false;
-    const [m, d] = mmdd.split('-').map(Number);
-    for(const yr of [monday.getFullYear(), monday.getFullYear() + 1]){
-      const dt = new Date(yr, m - 1, d);
-      if(dt >= monday && dt <= sunday) return true;
-    }
-    return false;
-  };
-  const found = TEAM.filter(p => inThisWeek(p.birthday));
-  if(!found.length){ cEl.textContent='0'; nEl.textContent='No birthdays this week'; return; }
-  cEl.textContent = String(found.length);
-  const names = found.map(p => p.name); const max = 3;
-  nEl.textContent = names.length <= max ? names.join(', ') : names.slice(0, max).join(', ') + ' +' + (names.length - max) + ' more';
-})();
-
-// New joiners this month
-(() => {
-  const cEl = document.getElementById('joinerCount');
-  const nEl = document.getElementById('joinerNames');
-  const today = new Date();
-  const y = today.getFullYear(), m = today.getMonth();
-  const found = TEAM.filter(p => {
-    if(!p.joinDate) return false;
-    const d = new Date(p.joinDate);
-    return d.getFullYear() === y && d.getMonth() === m;
-  });
-  if(!found.length){ cEl.textContent='0'; nEl.textContent='No new joiners yet this month'; return; }
-  cEl.textContent = String(found.length);
-  const names = found.map(p => p.name); const max = 3;
-  nEl.textContent = names.length <= max ? names.join(', ') : names.slice(0, max).join(', ') + ' +' + (names.length - max) + ' more';
-})();
-
-// Next holiday
-(() => {
-  const holidays = [
-    { date: '2026-01-01', name: "New Year's Day · Tết Dương Lịch" },
-    { date: '2026-02-16', name: 'Tết Nguyên Đán · Lunar New Year (Tết Bính Ngọ)' },
-    { date: '2026-04-26', name: 'Hùng Kings Festival · Giỗ Tổ Hùng Vương' },
-    { date: '2026-04-30', name: 'Reunification Day · Ngày Giải Phóng' },
-    { date: '2026-05-01', name: 'International Labour Day · Quốc tế Lao động' },
-    { date: '2026-09-02', name: 'National Day · Quốc Khánh' },
-    { date: '2027-01-01', name: "New Year's Day · Tết Dương Lịch" },
-  ];
-  const v = document.getElementById('nextHoliday');
-  const n = document.getElementById('nextHolidayName');
-  const today = new Date(); today.setHours(0,0,0,0);
-  const upcoming = holidays.map(h => ({ ...h, d: new Date(h.date) })).filter(h => h.d >= today).sort((a,b) => a.d - b.d)[0];
-  if(!upcoming){ v.textContent='—'; n.textContent='Update holiday list'; return; }
-  const diff = Math.ceil((upcoming.d - today) / 86400000);
-  const fmt = upcoming.d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  v.textContent = fmt;
-  n.textContent = upcoming.name + ' · in ' + diff + ' day' + (diff===1?'':'s');
-})();
-</script>
 
 <script src="embed.js"></script>
 </body>

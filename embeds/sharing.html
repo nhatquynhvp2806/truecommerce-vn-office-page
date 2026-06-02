@@ -43,9 +43,6 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
           Coffee with us
         </a>
-        <a class="btn" style="background:#fff;color:var(--tc-navy);border:1px solid var(--line)" href="#" data-link="learn-more">
-          Learn more →
-        </a>
       </div>
     </div>
 
@@ -68,6 +65,39 @@
     </div>
   </div>
 </div>
+
+<script>
+// ====================================================================
+//  LINKS phần 30-Min Sharing — sửa ở ĐÂY (1 chỗ).
+//  • coffee : link form đặt lịch "Coffee with us".
+//  • video  : link video hướng dẫn (YouTube / SharePoint Stream / .mp4).
+//             Đổi video sau này: chỉ thay URL trong dấu '' rồi Commit.
+// ====================================================================
+const SHARING_LINKS = {
+  coffee: 'https://forms.office.com/r/mhFhUAEDc3',
+  video:  'PASTE_VIDEO_LINK',
+};
+
+// Coffee with us button
+document.querySelectorAll('[data-link="coffee-with-us"]').forEach(a => {
+  if (SHARING_LINKS.coffee && SHARING_LINKS.coffee !== 'PASTE_LINK') {
+    a.href = SHARING_LINKS.coffee; a.target = '_blank'; a.rel = 'noopener';
+  }
+});
+
+// Video play button → mở video ở tab mới (khi đã có link)
+(function(){
+  const play = document.querySelector('.play[data-video]');
+  if (!play) return;
+  const url = SHARING_LINKS.video;
+  if (url && url !== 'PASTE_VIDEO_LINK') {
+    const open = () => window.open(url, '_blank', 'noopener');
+    play.addEventListener('click', open);
+    const card = play.closest('.video-card');
+    if (card) { card.style.cursor = 'pointer'; card.addEventListener('click', open); }
+  }
+})();
+</script>
 
 <script src="embed.js"></script>
 </body>

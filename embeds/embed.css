@@ -41,7 +41,7 @@ html,body{margin:0;padding:0}
 body{
   font-family:'Manrope', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   color:var(--ink);
-  background:#fff;
+  background:var(--bg);
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
   line-height:1.55;
@@ -215,7 +215,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .slide-deck{
   background:linear-gradient(160deg,var(--tc-navy-3),var(--tc-navy));
   border-radius:28px;padding:28px;color:#fff;position:relative;overflow:hidden;
-  box-shadow:var(--shadow-md);max-width:940px;margin:0 auto;
+  box-shadow:var(--shadow-md);max-width:none;
 }
 .slide-deck::before{content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;border:1px solid rgba(255,255,255,.08);border-radius:50%;pointer-events:none}
 .slide-deck::after{content:"";position:absolute;right:-160px;top:-160px;width:500px;height:500px;border:1px solid rgba(255,255,255,.05);border-radius:50%;pointer-events:none}
@@ -269,6 +269,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .svc .sla{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--svc-c1,var(--tc-blue));background:var(--svc-bg, var(--bg-2));padding:4px 9px;border-radius:6px}
 .svc-btn{display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:12.5px;color:var(--svc-c1,var(--tc-navy));padding:0}
 .svc-btn:hover{text-decoration:underline}
+.svc-btn.is-soon{color:var(--ink-3);font-weight:600;cursor:default;pointer-events:none;opacity:.6}
+.svc-btn.is-soon:hover{text-decoration:none}
 .svc-btn svg{transition:transform .15s}
 .svc-btn:hover svg{transform:translateX(3px)}
 .svc.c-cyan   { --svc-c1:#0698C2;  --svc-c2:#00B5E2;  --svc-bg:#E6F7FC; }

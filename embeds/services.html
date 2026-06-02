@@ -108,6 +108,34 @@
   </div>
 </div>
 
+<script>
+// ====================================================================
+//  FORM LINKS — TẤT CẢ link form nằm ở ĐÂY (1 chỗ duy nhất).
+//  • Đổi/ thêm form sau này: chỉ sửa URL trong dấu '' tương ứng rồi Commit.
+//  • Chưa có form thì để nguyên 'PASTE_LINK' → nút sẽ hiện mờ "Coming soon".
+// ====================================================================
+const FORM_LINKS = {
+  'office-supplies-form': 'https://forms.office.com/r/RYS6rcpKBQ',
+  'taxi-card-form':       'https://forms.office.com/r/RYS6rcpKBQ',
+  'employee-id-form':     'https://forms.office.com/r/RYS6rcpKBQ',
+  'seat-id-form':         'https://forms.office.com/r/DerWQprJfX',
+  'office-issue-form':    'https://forms.office.com/r/peQ3bGiAkW',
+  'salary-advance-form':  'https://forms.office.com/r/N6pEL3Yvg7',
+  'ot-meal-form':         'https://forms.office.com/r/4Nh9Ckt6pd',
+  'sport-club-form':      'https://forms.office.com/r/mhFhUAEDc3',
+};
+
+document.querySelectorAll('.svc-btn[data-link]').forEach(a => {
+  const url = FORM_LINKS[a.dataset.link];
+  if (url && url !== 'PASTE_LINK') {
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+  } else {
+    a.classList.add('is-soon');
+    a.innerHTML = 'Coming soon';
+  }
+});
+</script>
+
 <script src="embed.js"></script>
 </body>
 </html>

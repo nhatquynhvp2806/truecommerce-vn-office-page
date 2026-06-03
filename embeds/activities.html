@@ -230,8 +230,43 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     try { await _msal.handleRedirectPromise(); } catch(_){}
     return _msal;
   }
-  // interactive=false → silent only (throws 'need-signin' if it can't). true → popup.
-  async function getToken(interactive){
+  // Eagerly initialise MSAL the moment the page loads. This is the key fix:
+  // when the user clicks "Sign in" we must NOT await any network work before
+  // opening the popup, or the browser drops the click gesture and blocks it.
+  const _msalReady = (typeof msal === 'undefined')
+    ? Promise.resolve(null)
+    : msalApp().catch(() => null);
+
+  // Detect "the browser blocked our popup" so we can fall back to a redirect.
+  function isPopupBlocked(e){
+    const s = ((e && (e.errorCode || e.errorMessage || e.message)) || '') + '';
+    return /popup_window_error|empty_window_error|popup.*block|block.*popup/i.test(s);
+  }
+
+  // Explicit, user-initiated sign-in. Opens the popup IMMEDIATELY inside the
+  // click handler (no silent checks first), then falls back to a full-page
+  // redirect if the popup is blocked (e.g. opened outside SharePoint).
+  async function interactiveSignIn(){
+    const app = await _msalReady;
+    if(!app) throw new Error('MSAL library failed to load.');
+    let r;
+    try {
+      r = await app.loginPopup({ scopes: MSAL_SCOPES });
+    } catch(e){
+      if(isPopupBlocked(e)){
+        // Navigates the whole page to Microsoft; we come back via
+        // handleRedirectPromise() on reload and the account is then cached.
+        await app.loginRedirect({ scopes: MSAL_SCOPES });
+        return null;                       // page is unloading
+      }
+      throw e;                             // user cancelled / closed popup, etc.
+    }
+    app.setActiveAccount(r.account);
+    return r.account;
+  }
+
+  // Silent-only token. Throws 'need-signin' if there's no usable session.
+  async function getToken(){
     const app = await msalApp();
     let account = app.getActiveAccount() || app.getAllAccounts()[0];
     if(account){
@@ -241,11 +276,7 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
       try { const r = await app.ssoSilent({ scopes: MSAL_SCOPES }); app.setActiveAccount(r.account); return r.accessToken; }
       catch(_){ /* no live M365 session in this context — fall through */ }
     }
-    if(!interactive) throw new Error('need-signin');
-    const r = await app.loginPopup({ scopes: MSAL_SCOPES });
-    app.setActiveAccount(r.account);
-    try { const r2 = await app.acquireTokenSilent({ scopes: MSAL_SCOPES, account: r.account }); return r2.accessToken; }
-    catch(_){ return r.accessToken; }
+    throw new Error('need-signin');
   }
   const encPath = p => p.split('/').filter(Boolean).map(encodeURIComponent).join('/');
   async function graphEvents(interactive){
@@ -254,7 +285,7 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
       try { const c = JSON.parse(localStorage.getItem(cacheKey)||'null');
             if(c && Date.now()-c.t < CACHE_TTL_MS) return c.d; } catch(_){}
     }
-    const token = await getToken(interactive);
+    const token = await getToken();
     const g = async (path) => {
       const r = await fetch('https://graph.microsoft.com/v1.0'+path, { headers:{ Authorization:'Bearer '+token } });
       if(!r.ok) throw new Error('Graph '+r.status+' on '+path);
@@ -469,7 +500,26 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     }
   }
 
-  $('signinBtn').addEventListener('click', () => load(true));
+  // Open the sign-in popup synchronously on the click (no awaits before it),
+  // then reload the gallery once we have a session.
+  $('signinBtn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    try {
+      const acct = await interactiveSignIn();
+      if(acct === null) return;            // redirecting away — page will reload
+      load(true);                          // signed in → bypass cache, fetch fresh
+    } catch(err){
+      console.warn('[activities] sign-in cancelled/failed:', err);
+      const popupless = isPopupBlocked(err);
+      if(popupless){
+        fail("Your browser blocked the sign-in popup. Please allow popups for this page and try again.");
+      }
+      // user-cancelled: silently stay on the sign-in screen
+    } finally {
+      btn.disabled = false;
+    }
+  });
   $('retryBtn').addEventListener('click', () => load(SOURCE==='graph'));
   load(false);
 })();

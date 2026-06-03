@@ -94,11 +94,14 @@
 </div>
 
 <!--
-  MSAL (Microsoft Authentication Library) — official Microsoft CDN.
-  If your SharePoint Content-Security-Policy blocks this CDN, download the file
-  and self-host it as embeds/msal-browser.min.js, then point this src there.
+  MSAL (Microsoft Authentication Library) — SELF-HOSTED in this folder.
+  Your network/SharePoint blocks the Microsoft CDN, so we load it locally.
+  ▶ Download this exact file and put it next to activities.html as
+    "msal-browser.min.js":
+      https://alcdn.msauth.net/browser/2.38.4/js/msal-browser.min.js
+    (open the link, Ctrl+S / Save As, name it msal-browser.min.js)
 -->
-<script src="https://alcdn.msauth.net/browser/2.38.4/js/msal-browser.min.js"></script>
+<script src="msal-browser.min.js"></script>
 
 <script>
 /* ============================================================================
@@ -457,9 +460,12 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     } catch(err){
       console.warn('[activities] load failed:', err);
       if(SOURCE==='graph' && (err.message==='need-signin')) { show('signin'); return; }
-      fail(SOURCE==='graph'
-        ? "Couldn't reach SharePoint. You may need to sign in, or the app may need admin consent."
-        : 'Something went wrong loading photos. Please try again in a moment.');
+      const msalMissing = err && /MSAL library failed to load/.test(err.message||'');
+      fail(msalMissing
+        ? "Sign-in library (msal-browser.min.js) didn't load. Make sure that file sits next to activities.html in the embeds/ folder."
+        : SOURCE==='graph'
+          ? "Couldn't reach SharePoint. You may need to sign in, or the app may need admin consent. (" + (err.message||err) + ")"
+          : 'Something went wrong loading photos. Please try again in a moment.');
     }
   }
 

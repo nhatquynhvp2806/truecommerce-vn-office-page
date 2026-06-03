@@ -8,7 +8,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="embed.css">
-<!-- MSAL for Microsoft login -->
+<style id="activities-overrides">
+  /* Robust lightbox stage sizing — works for raster photos AND inline-SVG
+     placeholders (which collapse when constrained only by max-height). */
+  #lbStage img, #lbStage video{
+    width:100%; height:100%;
+    max-width:100%; max-height:100%;
+    object-fit:contain;
+  }
+</style>
 </head>
 <body>
 <div class="embed-wrap embed-section">
@@ -17,23 +25,50 @@
       <div>
         <span class="eyebrow" style="color:var(--tc-coral)">Office life</span>
         <h2>Moments that <span class="accent">make us.</span></h2>
-        <p class="vn">Engagement activities at Vietnam office.</p>
+        <p class="vn">Engagement activities · TrueCommerce Vietnam office.</p>
       </div>
       <div class="filters" id="filters"></div>
     </div>
   </div>
 
   <div class="masonry" id="masonry"></div>
+
+  <!-- Empty (no events in this year) -->
   <div class="gallery-empty" id="galleryEmpty" style="display:none">
     <div class="ge-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
     </div>
-    <h3>No events yet for this year</h3>
-    <p>Upload a new event folder to SharePoint to get started.</p>
+    <h3>No photos yet for this year</h3>
+    <p>HR can add an event by dropping a folder of photos into<br/><b>Event Photo › {year} › {event name}</b> on SharePoint.</p>
   </div>
+
+  <!-- Sign-in needed (silent SSO couldn't complete) -->
+  <div class="gallery-empty" id="gallerySignin" style="display:none">
+    <div class="ge-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h3>Sign in to view the gallery</h3>
+    <p>These photos live in the People Team's SharePoint.<br/>Sign in with your TrueCommerce account to load them.</p>
+    <button class="btn btn-primary" id="signinBtn" style="margin-top:18px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      Sign in with Microsoft
+    </button>
+  </div>
+
+  <!-- Generic error -->
+  <div class="gallery-empty" id="galleryError" style="display:none">
+    <div class="ge-icon" style="color:var(--tc-coral);background:#FCEAE4">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+    </div>
+    <h3>Couldn't load the gallery</h3>
+    <p id="errorMsg">Something went wrong reaching SharePoint. Please try again in a moment.</p>
+    <button class="btn btn-primary" id="retryBtn" style="margin-top:18px">Try again</button>
+  </div>
+
+  <!-- Loading -->
   <div class="gallery-loading" id="galleryLoading">
     <div class="gl-spinner"></div>
-    <p>Loading the year in moments…</p>
+    <p>Loading the moments…</p>
   </div>
 </div>
 
@@ -58,239 +93,382 @@
   </div>
 </div>
 
+<!--
+  MSAL (Microsoft Authentication Library) — official Microsoft CDN.
+  If your SharePoint Content-Security-Policy blocks this CDN, download the file
+  and self-host it as embeds/msal-browser.min.js, then point this src there.
+-->
+<script src="https://alcdn.msauth.net/browser/2.38.4/js/msal-browser.min.js"></script>
+
 <script>
-// ============================================================
-//  CONFIG
-// ============================================================
-const CLIENT_ID  = '266bfe30-80b7-44d8-9827-da61d7cfd3e9';
-const TENANT_ID  = 'tcapc.onmicrosoft.com'; // hoặc tenant ID dạng GUID
-const SITE_HOST  = 'tcapc.sharepoint.com';
-const SITE_PATH  = '/sites/vietnampeopleteam';
-const FOLDER_PATH = '8. People Experience/VN Office Page/Event Photo';
+/* ============================================================================
+   ACTIVITIES GALLERY — DATA SOURCE CONFIG
+   ----------------------------------------------------------------------------
+   Change DATA_SOURCE to pick where photos come from. Everything else below
+   is wiring you shouldn't need to touch.
 
-const msalConfig = {
-  auth: {
-    clientId: CLIENT_ID,
-    authority: `https://login.microsoftonline.com/${TENANT_ID}`,
-    redirectUri: window.location.href.split('?')[0],
-  },
-  cache: { cacheLocation: 'sessionStorage' }
-};
+     'graph'    → Read straight from SharePoint via Microsoft Graph (MSAL).
+                  HR just uploads to SharePoint; the page auto-detects years &
+                  events. Needs the Azure AD app registration below. ◀ DEFAULT
+     'manifest' → Fetch a pre-built events.json (e.g. produced by a Power
+                  Automate flow). Zero login on the page, never breaks.
+     'github'   → Legacy: read folders from a public GitHub repo.
 
-const loginRequest = {
-  scopes: ['https://tcapc.sharepoint.com/Sites.Read.All', 'https://tcapc.sharepoint.com/AllSites.Read']
-};
+   Tip: open this page with ?demo=1 to preview the layout with sample photos
+   (no SharePoint / login needed). Great for design review.
+   ========================================================================== */
+const DATA_SOURCE = 'graph';
 
-const msalInstance = new msal.PublicClientApplication(msalConfig);
+/* ---- 'graph' settings (SharePoint via MSAL) ------------------------------ */
+const MSAL_CLIENT_ID = '266bfe30-80b7-44d8-9827-da61d7cfd3e9';
+// Single-org silent SSO. If you prefer to lock it to your tenant exactly,
+// replace 'organizations' with your tenant GUID or e.g. 'tcapc.onmicrosoft.com'.
+const MSAL_AUTHORITY  = 'https://login.microsoftonline.com/organizations';
+// Delegated permission the app registration must have (with admin consent):
+//   Sites.Read.All  — read items in the People Team site.
+const MSAL_SCOPES     = ['Sites.Read.All'];
 
-async function getToken() {
-  await msalInstance.initialize();
-  // Try silent first (already logged in)
-  const accounts = msalInstance.getAllAccounts();
-  if (accounts.length > 0) {
-    try {
-      const res = await msalInstance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-      return res.accessToken;
-    } catch {}
+const SP_HOSTNAME     = 'tcapc.sharepoint.com';
+const SP_SITE_PATH    = '/sites/vietnampeopleteam';      // server-relative site path
+// Folder inside the site's default "Shared Documents" library that holds the
+// year folders. Spaces & dots are fine — they're URL-encoded automatically.
+const SP_ROOT_FOLDER  = '8. People Experience/VN Office Page/Event Photo';
+
+/* ---- 'manifest' settings ------------------------------------------------- */
+// JSON shape: { "events": [ { "year":2025, "title":"Tết Party",
+//   "cover":"https://…/cover.jpg", "images":["https://…", …], "video":null } ] }
+const MANIFEST_URL    = 'events.json';
+
+/* ---- 'github' settings (legacy) ------------------------------------------ */
+const GITHUB_USER     = 'nhatquynhvp2806';
+const GITHUB_REPO     = 'truecommerce-vn-office-page';
+const GITHUB_BRANCH   = 'main';
+const GITHUB_EVENTS   = 'events';
+
+const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30 min
+/* ========================================================================== */
+
+
+(() => {
+  const $ = id => document.getElementById(id);
+  const masonry = $('masonry'), filters = $('filters');
+  const elLoading = $('galleryLoading'), elEmpty = $('galleryEmpty');
+  const elSignin = $('gallerySignin'), elError = $('galleryError'), elErrMsg = $('errorMsg');
+  if(!masonry) return;
+
+  const params  = new URLSearchParams(location.search);
+  const SOURCE  = params.has('demo') ? 'demo' : DATA_SOURCE;
+
+  const isImg   = n => /\.(jpe?g|png|webp|gif|avif)$/i.test(n);
+  const isVideo = n => /\.(mp4|mov|webm|m4v)$/i.test(n);
+  const isCover = n => /^cover\.(jpe?g|png|webp|avif)$/i.test(n);
+  const yearOf  = s => { const m = String(s).match(/(20\d{2})/); return m ? parseInt(m[1],10) : null; };
+  const prettify = s => String(s).replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
+
+  function show(state){
+    elLoading.style.display = state==='loading' ? '' : 'none';
+    elEmpty.style.display   = state==='empty'   ? '' : 'none';
+    elSignin.style.display  = state==='signin'  ? '' : 'none';
+    elError.style.display   = state==='error'   ? '' : 'none';
+    if(window.tcEmbedNotifyHeight) setTimeout(window.tcEmbedNotifyHeight, 60);
   }
-  // Popup login
-  const res = await msalInstance.acquireTokenPopup(loginRequest);
-  return res.accessToken;
-}
+  function fail(msg){ if(msg) elErrMsg.textContent = msg; show('error'); }
 
-const isImg   = n => /\.(jpe?g|png|webp|gif|avif)$/i.test(n);
-const isCover = n => /^cover\.(jpe?g|png|webp)$/i.test(n);
+  /* ===================== DATA SOURCES ===================== */
+  // All sources return a normalised array:
+  //   { year:Number, title, folder, cover:url, images:[{url,name}], video:url|null }
 
-async function graphFetch(url, token) {
-  const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
-  if (!r.ok) throw new Error('Graph fetch failed: ' + r.status + ' ' + url);
-  return r.json();
-}
-
-async function fetchEvents(token) {
-  // Get site ID
-  const siteData = await graphFetch(
-    `https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}`,
-    token
-  );
-  const siteId = siteData.id;
-
-  // Get drive ID (Documents)
-  const drivesData = await graphFetch(
-    `https://graph.microsoft.com/v1.0/sites/${siteId}/drives`,
-    token
-  );
-  const drive = drivesData.value.find(d => d.name === 'Documents') || drivesData.value[0];
-  const driveId = drive.id;
-
-  // Get Event Photo folder
-  const folderEncoded = encodeURIComponent(FOLDER_PATH);
-  const rootData = await graphFetch(
-    `https://graph.microsoft.com/v1.0/drives/${driveId}/root:/${FOLDER_PATH}:/children`,
-    token
-  );
-
-  const events = [];
-
-  // Year folders (2025, 2026...)
-  const yearFolders = rootData.value.filter(i => i.folder && /^\d{4}$/.test(i.name));
-
-  await Promise.all(yearFolders.map(async (yf) => {
-    const year = parseInt(yf.name, 10);
-    const yearData = await graphFetch(
-      `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${yf.id}/children`,
-      token
-    );
-    const eventFolders = yearData.value.filter(i => i.folder);
-
-    await Promise.all(eventFolders.map(async (ef) => {
-      const title = ef.name.replace(/^\d{4}[-_\s]*\d{0,2}[-_\s]*/,'').replace(/[-_]+/g,' ').trim() || ef.name;
-      const filesData = await graphFetch(
-        `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${ef.id}/children`,
-        token
-      );
-      const images = filesData.value.filter(f => f.file && isImg(f.name));
-      if (!images.length) return;
-
-      const coverFile = images.find(f => isCover(f.name)) || images[0];
-      const others    = images.filter(f => f.name !== coverFile.name);
-      const allImgs   = [coverFile, ...others];
-
-      events.push({
-        year,
-        title,
-        cover: coverFile['@microsoft.graph.downloadUrl'],
-        images: allImgs.map(f => ({ url: f['@microsoft.graph.downloadUrl'], name: f.name })),
-      });
-    }));
-  }));
-
-  return events;
-}
-
-// ── Render ──────────────────────────────────────────────────
-const ASPECTS = ['h-m','h-l','h-s','h-m','h-xl','h-s','h-l','h-m'];
-let allEvents = [];
-
-function render(year) {
-  const masonry = document.getElementById('masonry');
-  const empty   = document.getElementById('galleryEmpty');
-  masonry.innerHTML = '';
-  const list = allEvents.filter(e => e.year === year);
-  if (!list.length) { empty.style.display = ''; return; }
-  empty.style.display = 'none';
-
-  list.forEach((ev, i) => {
-    const tile = document.createElement('div');
-    tile.className = 'tile ' + ASPECTS[i % ASPECTS.length];
-    tile.innerHTML =
-      '<div class="ph">' +
-        '<img src="' + ev.cover + '" alt="' + ev.title + '" loading="lazy" />' +
-        '<div class="grad"></div>' +
-        (ev.images.length > 1 ? '<div class="count-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' + ev.images.length + '</div>' : '') +
-        '<div class="label"><div class="ttl">' + ev.title + '</div></div>' +
-      '</div>';
-    tile.addEventListener('click', () => openLightbox(ev));
-    masonry.appendChild(tile);
-  });
-  if (window.tcEmbedNotifyHeight) setTimeout(window.tcEmbedNotifyHeight, 400);
-}
-
-function buildYearFilter(years, defaultYear) {
-  const filters = document.getElementById('filters');
-  filters.innerHTML = '';
-  years.forEach(y => {
-    const b = document.createElement('button');
-    b.textContent = String(y);
-    b.dataset.year = String(y);
-    if (y === defaultYear) b.classList.add('active');
-    b.addEventListener('click', () => {
-      [...filters.children].forEach(x => x.classList.toggle('active', x === b));
-      render(y);
+  // ---- demo ----
+  function demoEvents(){
+    const pal = [['#1862D9','#0A1F3D'],['#FF6B4A','#F5B335'],['#00B5E2','#0698C2'],
+                 ['#7BBA3F','#1BAE9A'],['#8A6CE3','#6041B5'],['#F5B335','#E0533A']];
+    const ph = (label, p) => {
+      const [a,b] = pal[p % pal.length];
+      const svg =
+        "<svg xmlns='http://www.w3.org/2000/svg' width='640' height='480' viewBox='0 0 640 480'>"+
+        "<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>"+
+        "<stop offset='0' stop-color='"+a+"'/><stop offset='1' stop-color='"+b+"'/></linearGradient>"+
+        "<pattern id='s' width='16' height='16' patternTransform='rotate(45)' patternUnits='userSpaceOnUse'>"+
+        "<line x1='0' y1='0' x2='0' y2='16' stroke='rgba(255,255,255,.10)' stroke-width='8'/></pattern></defs>"+
+        "<rect width='640' height='480' fill='url(#g)'/><rect width='640' height='480' fill='url(#s)'/>"+
+        "<text x='50%' y='51%' font-family='ui-monospace,monospace' font-size='22' letter-spacing='1' "+
+        "fill='rgba(255,255,255,.9)' text-anchor='middle'>"+label+"</text></svg>";
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    };
+    const ev = (year, title, n, p, video) => ({
+      year, title, folder: title,
+      cover: ph(title.toUpperCase(), p),
+      images: Array.from({length:n}, (_,i) => ({ url: ph(title.toUpperCase()+' · '+(i+1), p+i), name:'photo'+(i+1)+'.jpg' })),
+      video: video ? 'about:blank' : null
     });
-    filters.appendChild(b);
-  });
-}
-
-// ── Lightbox ────────────────────────────────────────────────
-const lb        = document.getElementById('lightbox');
-const lbStage   = document.getElementById('lbStage');
-const lbTitle   = document.getElementById('lbTitle');
-const lbCounter = document.getElementById('lbCounter');
-const lbThumbs  = document.getElementById('lbThumbs');
-const lbPrev    = document.getElementById('lbPrev');
-const lbNext    = document.getElementById('lbNext');
-const lbClose   = document.getElementById('lbClose');
-let lbItems = [], lbIdx = 0, lbEvent = null;
-
-function openLightbox(ev) {
-  lbEvent = ev; lbItems = ev.images; lbIdx = 0;
-  renderLightbox();
-  lb.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeLightbox() {
-  lb.classList.remove('open');
-  document.body.style.overflow = '';
-  lbStage.innerHTML = '';
-}
-function renderLightbox() {
-  const it = lbItems[lbIdx];
-  lbStage.innerHTML = '';
-  const img = document.createElement('img');
-  img.src = it.url; img.alt = lbEvent.title;
-  lbStage.appendChild(img);
-  lbTitle.textContent = lbEvent.title;
-  lbCounter.textContent = (lbIdx + 1) + ' / ' + lbItems.length;
-  lbPrev.disabled = lbIdx === 0;
-  lbNext.disabled = lbIdx === lbItems.length - 1;
-  lbThumbs.innerHTML = '';
-  lbItems.forEach((it2, i) => {
-    const t = document.createElement('button');
-    t.className = 'lb-thumb' + (i === lbIdx ? ' active' : '');
-    const img2 = document.createElement('img');
-    img2.src = it2.url; img2.loading = 'lazy';
-    t.appendChild(img2);
-    t.addEventListener('click', () => { lbIdx = i; renderLightbox(); });
-    lbThumbs.appendChild(t);
-  });
-}
-
-lbPrev.addEventListener('click', () => { if (lbIdx > 0) { lbIdx--; renderLightbox(); } });
-lbNext.addEventListener('click', () => { if (lbIdx < lbItems.length - 1) { lbIdx++; renderLightbox(); } });
-lbClose.addEventListener('click', closeLightbox);
-lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
-document.addEventListener('keydown', e => {
-  if (!lb.classList.contains('open')) return;
-  if (e.key === 'Escape') closeLightbox();
-  if (e.key === 'ArrowLeft' && lbIdx > 0) { lbIdx--; renderLightbox(); }
-  if (e.key === 'ArrowRight' && lbIdx < lbItems.length - 1) { lbIdx++; renderLightbox(); }
-});
-
-// ── Init ────────────────────────────────────────────────────
-(async () => {
-  const loading = document.getElementById('galleryLoading');
-  const empty   = document.getElementById('galleryEmpty');
-  const filters = document.getElementById('filters');
-  try {
-    const token = await getToken();
-    allEvents = await fetchEvents(token);
-  } catch (err) {
-    console.error('Failed:', err);
-    loading.style.display = 'none';
-    empty.style.display = '';
-    empty.querySelector('p').textContent = 'Could not load events. Please make sure you are logged in to Microsoft 365.';
-    return;
+    return [
+      ev(2026, 'Tết Lì Xì', 4, 1, false),
+      ev(2026, 'Sports Day', 5, 3, false),
+      ev(2025, 'Year End Party', 6, 0, false),
+      ev(2025, 'Team Building Vũng Tàu', 5, 2, false),
+      ev(2025, "Women's Day", 3, 1, false),
+      ev(2025, 'Charity & Garage Sale', 4, 5, false),
+      ev(2025, 'Badminton Tournament', 4, 0, false),
+    ];
   }
-  loading.style.display = 'none';
-  if (!allEvents.length) { filters.innerHTML = ''; empty.style.display = ''; return; }
-  const years = [...new Set(allEvents.map(e => e.year))].sort((a,b) => b - a);
-  buildYearFilter(years, years[0]);
-  render(years[0]);
+
+  // ---- graph (SharePoint via MSAL) ----
+  let _msal;
+  async function msalApp(){
+    if(_msal) return _msal;
+    if(typeof msal === 'undefined') throw new Error('MSAL library failed to load.');
+    _msal = new msal.PublicClientApplication({
+      auth:  { clientId: MSAL_CLIENT_ID, authority: MSAL_AUTHORITY,
+               redirectUri: location.origin + location.pathname },
+      cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false },
+      system:{ allowRedirectInIframe: false }
+    });
+    if(_msal.initialize) await _msal.initialize();      // MSAL v3 no-op on v2
+    try { await _msal.handleRedirectPromise(); } catch(_){}
+    return _msal;
+  }
+  // interactive=false → silent only (throws 'need-signin' if it can't). true → popup.
+  async function getToken(interactive){
+    const app = await msalApp();
+    let account = app.getActiveAccount() || app.getAllAccounts()[0];
+    if(account){
+      try { const r = await app.acquireTokenSilent({ scopes: MSAL_SCOPES, account }); return r.accessToken; }
+      catch(_){ /* token expired / no consent — fall through */ }
+    } else {
+      try { const r = await app.ssoSilent({ scopes: MSAL_SCOPES }); app.setActiveAccount(r.account); return r.accessToken; }
+      catch(_){ /* no live M365 session in this context — fall through */ }
+    }
+    if(!interactive) throw new Error('need-signin');
+    const r = await app.loginPopup({ scopes: MSAL_SCOPES });
+    app.setActiveAccount(r.account);
+    try { const r2 = await app.acquireTokenSilent({ scopes: MSAL_SCOPES, account: r.account }); return r2.accessToken; }
+    catch(_){ return r.accessToken; }
+  }
+  const encPath = p => p.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+  async function graphEvents(interactive){
+    const cacheKey = 'tc-sp-events-' + MSAL_CLIENT_ID;
+    if(!interactive){
+      try { const c = JSON.parse(localStorage.getItem(cacheKey)||'null');
+            if(c && Date.now()-c.t < CACHE_TTL_MS) return c.d; } catch(_){}
+    }
+    const token = await getToken(interactive);
+    const g = async (path) => {
+      const r = await fetch('https://graph.microsoft.com/v1.0'+path, { headers:{ Authorization:'Bearer '+token } });
+      if(!r.ok) throw new Error('Graph '+r.status+' on '+path);
+      return r.json();
+    };
+    const site  = await g('/sites/'+SP_HOSTNAME+':'+SP_SITE_PATH);
+    const drive = await g('/sites/'+site.id+'/drive');               // default "Shared Documents"
+    const root  = '/drives/'+drive.id+'/root:/'+encPath(SP_ROOT_FOLDER)+':/children';
+    const yearFolders = (await g(root)).value.filter(x => x.folder);
+
+    const events = [];
+    for(const yf of yearFolders){
+      const year = yearOf(yf.name);
+      const evFolders = (await g('/drives/'+drive.id+'/items/'+yf.id+'/children')).value.filter(x => x.folder);
+      for(const ef of evFolders){
+        const files = (await g('/drives/'+drive.id+'/items/'+ef.id+'/children')).value.filter(x => x.file);
+        const imgs  = files.filter(x => isImg(x.name)).sort((a,b)=>a.name.localeCompare(b.name));
+        if(!imgs.length && !files.some(x=>isVideo(x.name))) continue;
+        const coverItem = imgs.find(x => isCover(x.name)) || imgs[0];
+        const gallery   = imgs.filter(x => x !== coverItem || imgs.length===1);  // cover shown first
+        const ordered   = coverItem ? [coverItem, ...imgs.filter(x=>x!==coverItem)] : imgs;
+        const videoItem = files.find(x => isVideo(x.name));
+        events.push({
+          year: year || (new Date()).getFullYear(),
+          title: prettify(ef.name),
+          folder: ef.name,
+          cover: coverItem ? coverItem['@microsoft.graph.downloadUrl'] : '',
+          images: ordered.map(x => ({ url: x['@microsoft.graph.downloadUrl'], name: x.name })),
+          video: videoItem ? videoItem['@microsoft.graph.downloadUrl'] : null
+        });
+      }
+    }
+    try { localStorage.setItem(cacheKey, JSON.stringify({ t: Date.now(), d: events })); } catch(_){}
+    return events;
+  }
+
+  // ---- manifest (Power Automate / hand-built JSON) ----
+  async function manifestEvents(){
+    const r = await fetch(MANIFEST_URL, { cache:'no-store' });
+    if(!r.ok) throw new Error('manifest HTTP '+r.status);
+    const data = await r.json();
+    const list = Array.isArray(data) ? data : (data.events || []);
+    return list.map(e => ({
+      year: e.year || yearOf(e.title) || (new Date()).getFullYear(),
+      title: e.title || e.folder || 'Event',
+      folder: e.folder || e.title || '',
+      cover: e.cover || (e.images && (typeof e.images[0]==='string' ? e.images[0] : e.images[0]?.url)) || '',
+      images: (e.images||[]).map(x => typeof x==='string' ? { url:x } : x),
+      video: e.video || null
+    }));
+  }
+
+  // ---- github (legacy) ----
+  async function githubEvents(){
+    const api = p => 'https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/contents/'+p+'?ref='+GITHUB_BRANCH;
+    const raw = p => 'https://raw.githubusercontent.com/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+GITHUB_BRANCH+'/'+p;
+    const r = await fetch(api(GITHUB_EVENTS));
+    if(!r.ok) throw new Error('GitHub HTTP '+r.status);
+    const folders = (await r.json()).filter(e => e.type==='dir');
+    const out = await Promise.all(folders.map(async f => {
+      const r2 = await fetch(api(GITHUB_EVENTS+'/'+f.name));
+      if(!r2.ok) return null;
+      const files = (await r2.json()).filter(x => x.type==='file');
+      const imgs  = files.filter(x => isImg(x.name)).map(x => x.name).sort();
+      if(!imgs.length) return null;
+      const cover = imgs.find(isCover) || imgs[0];
+      const ordered = [cover, ...imgs.filter(n => n!==cover)];
+      const vid = files.find(x => isVideo(x.name));
+      return {
+        year: yearOf(f.name) || (new Date()).getFullYear(),
+        title: prettify(f.name.replace(/^\d{4}[-_\s]*/, '')),
+        folder: f.name,
+        cover: raw(GITHUB_EVENTS+'/'+f.name+'/'+cover),
+        images: ordered.map(n => ({ url: raw(GITHUB_EVENTS+'/'+f.name+'/'+n), name:n })),
+        video: vid ? raw(GITHUB_EVENTS+'/'+f.name+'/'+vid.name) : null
+      };
+    }));
+    return out.filter(Boolean);
+  }
+
+  /* ===================== RENDER ===================== */
+  const ASPECTS = ['h-m','h-l','h-s','h-m','h-xl','h-s','h-l','h-m'];
+  let allEvents = [];
+
+  function render(year){
+    masonry.innerHTML = '';
+    const list = allEvents.filter(e => e.year === year);
+    if(!list.length){ show('empty'); return; }
+    show('grid'); elEmpty.style.display='none';
+    list.forEach((ev, i) => {
+      const total = (ev.images?.length || 0) + (ev.video ? 1 : 0);
+      const tile = document.createElement('div');
+      tile.className = 'tile ' + ASPECTS[i % ASPECTS.length] + (ev.video ? ' has-video' : '');
+      tile.innerHTML =
+        '<div class="ph">' +
+          (ev.cover ? '<img src="'+ev.cover+'" alt="'+ev.title+'" loading="lazy" />' : '') +
+          '<div class="grad"></div>' +
+          (ev.video ? '<div class="video-pill"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>' : '') +
+          (total > 1 ? '<div class="count-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'+total+'</div>' : '') +
+          '<div class="label"><div class="ttl">'+ev.title+'</div></div>' +
+        '</div>';
+      tile.addEventListener('click', () => openLightbox(ev));
+      masonry.appendChild(tile);
+    });
+    if(window.tcEmbedNotifyHeight) setTimeout(window.tcEmbedNotifyHeight, 400);
+  }
+
+  function buildYearFilter(){
+    if(!allEvents.length){ filters.innerHTML=''; return null; }
+    const counts = {};
+    allEvents.forEach(e => { counts[e.year] = (counts[e.year]||0)+1; });
+    const years = Object.keys(counts).map(Number).sort((a,b)=>b-a);
+    const cur = new Date().getFullYear();
+    const def = years.includes(cur) ? cur : years[0];
+    filters.innerHTML = '';
+    years.forEach(y => {
+      const b = document.createElement('button');
+      b.textContent = String(y);
+      if(y===def) b.classList.add('active');
+      b.addEventListener('click', () => {
+        [...filters.children].forEach(x => x.classList.toggle('active', x===b));
+        render(y);
+      });
+      filters.appendChild(b);
+    });
+    return def;
+  }
+
+  /* ===================== LIGHTBOX ===================== */
+  const lb=$('lightbox'), lbStage=$('lbStage'), lbTitle=$('lbTitle'),
+        lbCounter=$('lbCounter'), lbThumbs=$('lbThumbs'),
+        lbPrev=$('lbPrev'), lbNext=$('lbNext'), lbClose=$('lbClose');
+  let lbItems=[], lbIdx=0, lbEvent=null;
+
+  function openLightbox(ev){
+    lbEvent = ev; lbItems = [];
+    (ev.images||[]).forEach(im => lbItems.push({ type:'image', url: im.url }));
+    if(ev.video) lbItems.push({ type:'video', url: ev.video });
+    if(!lbItems.length) return;
+    lbIdx = 0; renderLightbox();
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox(){
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    lbStage.innerHTML = '';
+  }
+  function renderLightbox(){
+    const it = lbItems[lbIdx];
+    lbStage.innerHTML = '';
+    if(it.type==='image'){
+      const img = document.createElement('img');
+      img.src = it.url; img.alt = lbEvent.title;
+      lbStage.appendChild(img);
+    } else {
+      const v = document.createElement('video');
+      v.src = it.url; v.controls = true; v.autoplay = true;
+      lbStage.appendChild(v);
+    }
+    lbTitle.textContent = lbEvent.title;
+    lbCounter.textContent = (lbIdx+1)+' / '+lbItems.length;
+    lbPrev.disabled = lbIdx===0;
+    lbNext.disabled = lbIdx===lbItems.length-1;
+    lbThumbs.innerHTML = '';
+    lbItems.forEach((it2,i) => {
+      const t = document.createElement('button');
+      t.className = 'lb-thumb' + (i===lbIdx ? ' active' : '');
+      if(it2.type==='image'){
+        const img = document.createElement('img'); img.src = it2.url; img.loading='lazy'; t.appendChild(img);
+      } else {
+        t.innerHTML = '<div class="video-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>';
+      }
+      t.addEventListener('click', () => { lbIdx=i; renderLightbox(); });
+      lbThumbs.appendChild(t);
+    });
+  }
+  lbPrev.addEventListener('click', () => { if(lbIdx>0){ lbIdx--; renderLightbox(); } });
+  lbNext.addEventListener('click', () => { if(lbIdx<lbItems.length-1){ lbIdx++; renderLightbox(); } });
+  lbClose.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', e => { if(e.target===lb) closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if(!lb.classList.contains('open')) return;
+    if(e.key==='Escape') closeLightbox();
+    if(e.key==='ArrowLeft' && lbIdx>0){ lbIdx--; renderLightbox(); }
+    if(e.key==='ArrowRight' && lbIdx<lbItems.length-1){ lbIdx++; renderLightbox(); }
+  });
+
+  /* ===================== BOOT ===================== */
+  function finish(){
+    if(!allEvents.length){ show('empty'); return; }
+    const def = buildYearFilter();
+    render(def);
+  }
+  async function load(interactive){
+    show('loading');
+    try {
+      if(SOURCE==='demo')          allEvents = demoEvents();
+      else if(SOURCE==='graph')    allEvents = await graphEvents(interactive);
+      else if(SOURCE==='manifest') allEvents = await manifestEvents();
+      else if(SOURCE==='github')   allEvents = await githubEvents();
+      finish();
+    } catch(err){
+      console.warn('[activities] load failed:', err);
+      if(SOURCE==='graph' && (err.message==='need-signin')) { show('signin'); return; }
+      fail(SOURCE==='graph'
+        ? "Couldn't reach SharePoint. You may need to sign in, or the app may need admin consent."
+        : 'Something went wrong loading photos. Please try again in a moment.');
+    }
+  }
+
+  $('signinBtn').addEventListener('click', () => load(true));
+  $('retryBtn').addEventListener('click', () => load(SOURCE==='graph'));
+  load(false);
 })();
 </script>
 
-<script src="msal.js"></script>
 <script src="embed.js"></script>
 </body>
 </html>

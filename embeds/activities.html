@@ -123,7 +123,7 @@
 const DATA_SOURCE = 'graph';
 
 /* ---- 'graph' settings (SharePoint via MSAL) ------------------------------ */
-const MSAL_CLIENT_ID = '341fa484-8621-4fa6-866e-c1f150f25c55';
+const MSAL_CLIENT_ID = '266bfe30-80b7-44d8-9827-da61d7cfd3e9';
 // Single-org silent SSO. If you prefer to lock it to your tenant exactly,
 // replace 'organizations' with your tenant GUID or e.g. 'tcapc.onmicrosoft.com'.
 const MSAL_AUTHORITY  = 'https://login.microsoftonline.com/organizations';
@@ -139,6 +139,14 @@ const SP_SITE_PATH    = '/sites/VNPeopleteam-Publicfolder';   // server-relative
 // Folder inside the site's default "Documents" library that holds the year/event
 // folders. Spaces & dots are fine — they're URL-encoded automatically.
 const SP_ROOT_FOLDER  = 'VN Office Page/Event Photo';
+
+/* ---- 'proxy' settings (Azure Function / app-only, NO sign-in) ------------ 
+   The Function holds the client secret server-side, reads SharePoint with an
+   app-only token, and returns the SAME normalised JSON the page expects:
+     { "events": [ { year, title, folder, cover, images:[{url,name}], video } ] }
+   Put your deployed Function URL here (include the ?code=... key if the
+   Function uses 'function' auth level).                                       */
+const PROXY_URL       = 'https://REPLACE-ME.azurewebsites.net/api/events';
 
 /* ---- 'manifest' settings ------------------------------------------------- */
 // JSON shape: { "events": [ { "year":2025, "title":"Tết Party",
@@ -325,6 +333,22 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     return events;
   }
 
+  // ---- proxy (Azure Function, app-only — NO sign-in) ----
+  async function proxyEvents(){
+    const r = await fetch(PROXY_URL, { cache:'no-store' });
+    if(!r.ok) throw new Error('Proxy HTTP '+r.status);
+    const data = await r.json();
+    const list = Array.isArray(data) ? data : (data.events || []);
+    return list.map(e => ({
+      year:   e.year || (new Date()).getFullYear(),
+      title:  e.title || prettify(e.folder || ''),
+      folder: e.folder || e.title || '',
+      cover:  e.cover || (e.images && e.images[0] && (e.images[0].url || e.images[0])) || '',
+      images: (e.images || []).map(x => typeof x === 'string' ? { url:x, name:'' } : x),
+      video:  e.video || null
+    }));
+  }
+
   // ---- manifest (Power Automate / hand-built JSON) ----
   async function manifestEvents(){
     const r = await fetch(MANIFEST_URL, { cache:'no-store' });
@@ -496,6 +520,7 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     show('loading');
     try {
       if(SOURCE==='demo')          allEvents = demoEvents();
+      else if(SOURCE==='proxy')    allEvents = await proxyEvents();
       else if(SOURCE==='graph')    allEvents = await graphEvents(interactive);
       else if(SOURCE==='manifest') allEvents = await manifestEvents();
       else if(SOURCE==='github')   allEvents = await githubEvents();

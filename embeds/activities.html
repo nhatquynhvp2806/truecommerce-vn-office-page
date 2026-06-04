@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-embed="activities" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<html lang="en" data-embed="activities">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -17,14 +17,6 @@
     object-fit:contain;
   }
 </style>
-
-<!--[if gte mso 9]><xml>
-<mso:CustomDocumentProperties>
-<mso:MediaServiceImageTags msdt:dt="string"></mso:MediaServiceImageTags>
-<mso:lcf76f155ced4ddcb4097134ff3c332f msdt:dt="string"></mso:lcf76f155ced4ddcb4097134ff3c332f>
-<mso:TaxCatchAll msdt:dt="string"></mso:TaxCatchAll>
-</mso:CustomDocumentProperties>
-</xml><![endif]-->
 </head>
 <body>
 <div class="embed-wrap embed-section">
@@ -148,6 +140,14 @@ const SP_SITE_PATH    = '/sites/VNPeopleteam-Publicfolder';   // server-relative
 // folders. Spaces & dots are fine — they're URL-encoded automatically.
 const SP_ROOT_FOLDER  = 'VN Office Page/Event Photo';
 
+/* ---- 'proxy' settings (Azure Function / app-only, NO sign-in) ------------ 
+   The Function holds the client secret server-side, reads SharePoint with an
+   app-only token, and returns the SAME normalised JSON the page expects:
+     { "events": [ { year, title, folder, cover, images:[{url,name}], video } ] }
+   Put your deployed Function URL here (include the ?code=... key if the
+   Function uses 'function' auth level).                                       */
+const PROXY_URL       = 'https://REPLACE-ME.azurewebsites.net/api/events';
+
 /* ---- 'manifest' settings ------------------------------------------------- */
 // JSON shape: { "events": [ { "year":2025, "title":"Tết Party",
 //   "cover":"https://…/cover.jpg", "images":["https://…", …], "video":null } ] }
@@ -157,7 +157,7 @@ const MANIFEST_URL    = 'events.json';
 const GITHUB_USER     = 'nhatquynhvp2806';
 const GITHUB_REPO     = 'truecommerce-vn-office-page';
 const GITHUB_BRANCH   = 'main';
-const GITHUB_EVENTS   = 'events';
+const GITHUB_EVENTS   = 'photos';
 
 const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30 min
 /* ========================================================================== */
@@ -333,6 +333,22 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     return events;
   }
 
+  // ---- proxy (Azure Function, app-only — NO sign-in) ----
+  async function proxyEvents(){
+    const r = await fetch(PROXY_URL, { cache:'no-store' });
+    if(!r.ok) throw new Error('Proxy HTTP '+r.status);
+    const data = await r.json();
+    const list = Array.isArray(data) ? data : (data.events || []);
+    return list.map(e => ({
+      year:   e.year || (new Date()).getFullYear(),
+      title:  e.title || prettify(e.folder || ''),
+      folder: e.folder || e.title || '',
+      cover:  e.cover || (e.images && e.images[0] && (e.images[0].url || e.images[0])) || '',
+      images: (e.images || []).map(x => typeof x === 'string' ? { url:x, name:'' } : x),
+      video:  e.video || null
+    }));
+  }
+
   // ---- manifest (Power Automate / hand-built JSON) ----
   async function manifestEvents(){
     const r = await fetch(MANIFEST_URL, { cache:'no-store' });
@@ -349,32 +365,41 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     }));
   }
 
-  // ---- github (legacy) ----
+  // ---- github: photos/<YEAR>/<Event name>/<images>  (mirrors the SharePoint layout) ----
   async function githubEvents(){
-    const api = p => 'https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/contents/'+p+'?ref='+GITHUB_BRANCH;
-    const raw = p => 'https://raw.githubusercontent.com/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+GITHUB_BRANCH+'/'+p;
+    const enc = p => p.split('/').map(encodeURIComponent).join('/');
+    const api = p => 'https://api.github.com/repos/'+GITHUB_USER+'/'+GITHUB_REPO+'/contents/'+enc(p)+'?ref='+GITHUB_BRANCH;
+    const raw = p => 'https://raw.githubusercontent.com/'+GITHUB_USER+'/'+GITHUB_REPO+'/'+GITHUB_BRANCH+'/'+enc(p);
     const r = await fetch(api(GITHUB_EVENTS));
     if(!r.ok) throw new Error('GitHub HTTP '+r.status);
-    const folders = (await r.json()).filter(e => e.type==='dir');
-    const out = await Promise.all(folders.map(async f => {
-      const r2 = await fetch(api(GITHUB_EVENTS+'/'+f.name));
-      if(!r2.ok) return null;
-      const files = (await r2.json()).filter(x => x.type==='file');
-      const imgs  = files.filter(x => isImg(x.name)).map(x => x.name).sort();
-      if(!imgs.length) return null;
-      const cover = imgs.find(isCover) || imgs[0];
-      const ordered = [cover, ...imgs.filter(n => n!==cover)];
-      const vid = files.find(x => isVideo(x.name));
-      return {
-        year: yearOf(f.name) || (new Date()).getFullYear(),
-        title: prettify(f.name.replace(/^\d{4}[-_\s]*/, '')),
-        folder: f.name,
-        cover: raw(GITHUB_EVENTS+'/'+f.name+'/'+cover),
-        images: ordered.map(n => ({ url: raw(GITHUB_EVENTS+'/'+f.name+'/'+n), name:n })),
-        video: vid ? raw(GITHUB_EVENTS+'/'+f.name+'/'+vid.name) : null
-      };
-    }));
-    return out.filter(Boolean);
+    const yearFolders = (await r.json()).filter(e => e.type==='dir');
+    const events = [];
+    for(const yf of yearFolders){
+      const year = yearOf(yf.name) || (new Date()).getFullYear();
+      const r2 = await fetch(api(GITHUB_EVENTS+'/'+yf.name));
+      if(!r2.ok) continue;
+      const evFolders = (await r2.json()).filter(x => x.type==='dir');
+      for(const ef of evFolders){
+        const r3 = await fetch(api(GITHUB_EVENTS+'/'+yf.name+'/'+ef.name));
+        if(!r3.ok) continue;
+        const files = (await r3.json()).filter(x => x.type==='file');
+        const imgs  = files.filter(x => isImg(x.name)).map(x => x.name).sort();
+        if(!imgs.length) continue;
+        const cover = imgs.find(isCover) || imgs[0];
+        const ordered = [cover, ...imgs.filter(n => n!==cover)];
+        const vid = files.find(x => isVideo(x.name));
+        const base = GITHUB_EVENTS+'/'+yf.name+'/'+ef.name+'/';
+        events.push({
+          year,
+          title: prettify(ef.name),
+          folder: ef.name,
+          cover: raw(base+cover),
+          images: ordered.map(n => ({ url: raw(base+n), name:n })),
+          video: vid ? raw(base+vid.name) : null
+        });
+      }
+    }
+    return events;
   }
 
   /* ===================== RENDER ===================== */
@@ -495,6 +520,7 @@ const CACHE_TTL_MS    = 30 * 60 * 1000;   // re-list SharePoint at most every 30
     show('loading');
     try {
       if(SOURCE==='demo')          allEvents = demoEvents();
+      else if(SOURCE==='proxy')    allEvents = await proxyEvents();
       else if(SOURCE==='graph')    allEvents = await graphEvents(interactive);
       else if(SOURCE==='manifest') allEvents = await manifestEvents();
       else if(SOURCE==='github')   allEvents = await githubEvents();

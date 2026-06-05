@@ -9,20 +9,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="embed.css">
 <style id="process-overrides">
-  /* PDF viewer lives inside the branded deck card, in the 16:9 stage. */
-  .pdf-stage{position:relative;z-index:2;border-radius:14px;overflow:hidden;background:#0E2A4D;aspect-ratio:16/9;box-shadow:0 30px 60px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.08) inset}
-  .pdf-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#0E2A4D}
-  .pdf-state{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;color:#cdd9ea}
+  /* Each PDF page renders into a slide of the original branded carousel. */
+  .sv-slide.is-pdf{padding:0;background:#0E2A4D;align-items:center;justify-content:center}
+  .sv-slide.is-pdf canvas{width:100%;height:100%;object-fit:contain;display:block;background:#0E2A4D}
+  .sv-slide .page-spin{position:absolute;inset:0;display:grid;place-items:center}
+  .sv-slide .page-spin i{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--tc-cyan);animation:spin 1s linear infinite;display:block}
+  /* Centered overlay states (loading / error) on the stage. */
+  .pdf-state{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;color:#cdd9ea;background:linear-gradient(155deg,#0E2A4D 0%, #001A38 100%)}
   .pdf-state.show{display:flex}
   .pdf-state .ge-icon{width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.06);color:var(--tc-cyan-2);display:grid;place-items:center;margin:0 auto 16px;border:1px solid rgba(255,255,255,.12)}
   .pdf-state .ge-icon svg{width:26px;height:26px}
   .pdf-state h3{font-size:18px;color:#fff;margin:0 0 6px;font-weight:700;letter-spacing:-0.01em}
   .pdf-state p{font-size:14px;color:#9DB7DA;margin:0;line-height:1.6;max-width:460px}
-  .pdf-state code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#9FE6FA;background:rgba(0,181,226,.12);border:1px solid rgba(0,181,226,.25);border-radius:6px;padding:2px 7px}
   .pdf-state .gl-spinner{width:38px;height:38px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--tc-cyan);animation:spin 1s linear infinite;margin:0 auto 16px}
   .pdf-state .btn{margin-top:18px}
   .pdf-state.is-error .ge-icon{color:#FF9C85;background:rgba(255,107,74,.12);border-color:rgba(255,107,74,.25)}
-  .sd-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:#9DB7DA;font-weight:600}
   .btn-onnavy{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.18)}
   .btn-onnavy:hover{background:rgba(255,255,255,.14);transform:translateY(-1px)}
   .btn-onnavy svg{color:var(--tc-cyan-2)}
@@ -34,12 +35,12 @@
     <span class="eyebrow">Process overview</span>
     <h2>The Vietnam office handbook, <span class="accent">in one deck.</span></h2>
     <p class="vn">Quy trình nội bộ giải quyết thủ tục hành chính</p>
-    <p>The full bilingual process deck, embedded straight from the People Team's SharePoint. No sign-in needed — review it right here.</p>
+    <p>The full bilingual process deck — pulled live from the People Team's SharePoint. Flip through it right here; whenever HR swaps the PDF, these slides update automatically.</p>
   </div>
 
   <div class="slide-deck">
     <div class="sd-head">
-      <span class="tag" id="sdTag">Process deck · PDF</span>
+      <span class="tag" id="sdTag">Bilingual deck</span>
       <div class="actions" id="sdActions" style="display:none">
         <a class="btn btn-onnavy" id="btnOpen" href="#" target="_blank" rel="noopener" style="padding:10px 16px;font-size:13px">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
@@ -48,8 +49,15 @@
       </div>
     </div>
 
-    <div class="pdf-stage" id="pdfStage">
-      <iframe id="pdfFrame" title="Process deck (PDF)" style="display:none" allowfullscreen></iframe>
+    <div class="sv-stage" id="slideStage">
+      <button class="sv-prev" aria-label="Previous slide" id="svPrev" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="sv-next" aria-label="Next slide" id="svNext" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+
+      <div class="sv-track" id="svTrack"></div>
 
       <!-- Loading -->
       <div class="pdf-state show" id="stLoading">
@@ -62,8 +70,8 @@
         <div class="ge-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
         </div>
-        <h3>Paste the SharePoint embed link</h3>
-        <p>In SharePoint, open the PDF → <b>⋯ More</b> → <b>Embed</b>, copy the <code>src</code> URL, and paste it into <code>SP_EMBED_URL</code> near the top of <code>process.html</code>.</p>
+        <h3>Add the SharePoint PDF link</h3>
+        <p>Paste the file's download link into <b>PDF_URL</b> near the top of <b>process.html</b>.</p>
       </div>
 
       <!-- Error -->
@@ -71,100 +79,162 @@
         <div class="ge-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
         </div>
-        <h3>Couldn't show the deck</h3>
-        <p id="errorMsg">The embed link didn't load. Make sure the file's sharing is set so the office can view it.</p>
+        <h3>Couldn't load the deck</h3>
+        <p id="errorMsg">The PDF couldn't be fetched from SharePoint.</p>
         <a class="btn btn-onnavy" id="errOpen" href="#" target="_blank" rel="noopener" style="display:none">Open in SharePoint instead</a>
       </div>
     </div>
 
     <div class="sd-foot">
-      <div class="sd-meta" id="sdMeta">&nbsp;</div>
+      <div class="sv-counter" id="svCounter" style="visibility:hidden"><b id="svCurrent">1</b> / <span id="svTotal">1</span></div>
+      <div class="sv-dots" id="svDots"></div>
     </div>
   </div>
 </div>
 
+<!-- PDF.js (UMD). Not the Microsoft CDN, so it isn't blocked like msal. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
 <script>
 /* ============================================================================
-   PROCESS DECK — embeds the PDF straight from SharePoint. NO sign-in, NO code
-   library. Just paste one link.
+   PROCESS DECK — renders the SharePoint PDF as flip-through slides (no sign-in).
    ----------------------------------------------------------------------------
-   ► FIRST-TIME SETUP / HOW TO SWAP THE DECK (no dev):
+   ► HOW TO SWAP THE DECK (no dev):
+       Replace the PDF in SharePoint by uploading a file with the SAME NAME and
+       choosing "Replace". The link below keeps working, so these slides update
+       automatically. (If you upload a NEW filename, grab a fresh "Copy link"
+       and paste it into PDF_URL — keep the &download=1 on the end.)
 
-     A) Easiest — get a fresh embed link from SharePoint:
-        1. Open the PDF in SharePoint (the People Team library).
-        2. Click  ⋯ More  →  Embed.
-        3. Copy ONLY the URL inside  src="..."  (looks like
-           https://tcapc.sharepoint.com/sites/.../_layouts/15/embed.aspx?UniqueId=...).
-        4. Paste it into SP_EMBED_URL below, between the quotes.
+   ► PDF_URL must point at the RAW PDF bytes. Easiest: the SharePoint "Copy link"
+     value with  &download=1  appended (forces the file instead of a web page).
+     The link's sharing must be "People in TrueCommerce with the link".
 
-     B) To swap the deck later WITHOUT touching this file:
-        Replace the PDF in SharePoint by uploading a file with the SAME NAME and
-        choosing "Replace". SharePoint keeps the same link, so this page shows
-        the new PDF automatically. (If you upload a NEW filename instead, just
-        grab a new embed link via step A.)
-
-   Note: because this page is embedded inside SharePoint, viewers are already
-   signed in there — the PDF shows with no extra login prompt.
-
-   Optional: SP_FILE_URL adds an "Open in SharePoint" button (paste the normal
-   file link, the one you get from the blue "Share / Copy link" button).
+   Tip: open with ?demo=1 to preview the carousel without SharePoint.
    ========================================================================== */
-
-const SP_EMBED_URL = "https://tcapc.sharepoint.com/sites/VNPeopleteam-Publicfolder/_layouts/15/embed.aspx?UniqueId=de83676e-903e-4c95-4135-cdd57ddbbd01";   // ◀ embed.aspx?UniqueId=... (dạng DUY NHẤT cho phép nhúng)
-const SP_FILE_URL  = "https://tcapc.sharepoint.com/:b:/s/VNPeopleteam-Publicfolder/IQAD3oNnbpA-TJVBNc3Vfdu9AQP8TNSKUTqSMW_tuf7MMvw?e=hFfqg1";   // ◀ (optional) normal SharePoint file link for the button
-const DECK_LABEL   = "TrueCommerce · Quy trình nội bộ";  // shown on the tag / footer
+const PDF_URL     = "process.pdf";   // ◀ file PDF đặt CÙNG thư mục với process.html trên GitHub
+const SP_FILE_URL = "https://tcapc.sharepoint.com/:b:/s/VNPeopleteam-Publicfolder/IQAD3oNnbpA-TJVBNc3Vfdu9AQP8TNSKUTqSMW_tuf7MMvw?e=hFfqg1"; // "Open in SharePoint" button (bản gốc trên SharePoint)
+const DECK_LABEL  = "Bilingual deck";   // prefix on the tag (e.g. "Bilingual deck · 27 slides")
 /* ========================================================================== */
 
 
 (() => {
   const $ = id => document.getElementById(id);
-  const frame = $('pdfFrame');
-  if(!frame) return;
+  const track = $('svTrack'); if(!track) return;
+  const prev = $('svPrev'), next = $('svNext');
+  const counter = $('svCounter'), curEl = $('svCurrent'), totalEl = $('svTotal'), dotsEl = $('svDots');
+  const sdTag = $('sdTag'), actions = $('sdActions');
+  const states = { loading:$('stLoading'), setup:$('stSetup'), error:$('stError') };
 
   const params = new URLSearchParams(location.search);
   const demo   = params.has('demo');
+  const DPR    = Math.min(window.devicePixelRatio || 1, 2);
 
-  const states  = { loading:$('stLoading'), setup:$('stSetup'), error:$('stError') };
-  const actions = $('sdActions'), sdMeta = $('sdMeta'), sdTag = $('sdTag');
-
-  function show(state){
+  function show(state){            // state: '' (slides), 'loading', 'setup', 'error'
     Object.entries(states).forEach(([k,el]) => el.classList.toggle('show', k===state));
-    frame.style.display   = state==='ready' ? 'block' : 'none';
-    actions.style.display = (state==='ready' && SP_FILE_URL) ? 'flex' : 'none';
-    if(state!=='ready') sdMeta.innerHTML = '&nbsp;';
+    const ready = !state;
+    prev.style.display = next.style.display = ready ? 'grid' : 'none';
+    counter.style.visibility = ready ? 'visible' : 'hidden';
+    actions.style.display = (ready && SP_FILE_URL) ? 'flex' : 'none';
     if(window.tcEmbedNotifyHeight) setTimeout(window.tcEmbedNotifyHeight, 80);
   }
+  function fail(msg){ if(msg) $('errorMsg').textContent = msg; if(SP_FILE_URL){ $('errOpen').href=SP_FILE_URL; $('errOpen').style.display=''; } show('error'); }
 
-  function demoUrl(){
-    const pdf =
+  /* ---------- carousel ---------- */
+  let pdf=null, total=0, idx=0;
+  const slides=[], canvases=[], rendered=[];
+
+  function go(i){
+    idx = Math.max(0, Math.min(total-1, i));
+    track.style.transform = 'translateX(-' + (idx*100) + '%)';
+    curEl.textContent = idx+1;
+    [...dotsEl.children].forEach((d,di)=> d.classList.toggle('active', di===idx));
+    prev.disabled = idx===0; next.disabled = idx===total-1;
+    renderPage(idx); renderPage(idx+1); renderPage(idx-1);   // current + neighbours
+  }
+
+  async function renderPage(n){
+    if(n<0 || n>=total || rendered[n] || !pdf) return;
+    rendered[n] = true;                                       // claim early (avoid double render)
+    try {
+      const page = await pdf.getPage(n+1);
+      const stageW = track.clientWidth || 960;
+      const base = page.getViewport({ scale:1 });
+      const scale = (stageW / base.width) * DPR;
+      const vp = page.getViewport({ scale });
+      const cv = canvases[n];
+      cv.width = Math.ceil(vp.width); cv.height = Math.ceil(vp.height);
+      await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+      const sp = slides[n].querySelector('.page-spin'); if(sp) sp.remove();
+    } catch(e){ rendered[n] = false; console.warn('[process] page '+(n+1)+' render failed', e); }
+  }
+
+  function buildSlides(){
+    track.innerHTML=''; dotsEl.innerHTML='';
+    slides.length = canvases.length = rendered.length = 0;
+    for(let i=0;i<total;i++){
+      const s = document.createElement('div');
+      s.className = 'sv-slide is-pdf';
+      const cv = document.createElement('canvas');
+      const sp = document.createElement('div'); sp.className='page-spin'; sp.innerHTML='<i></i>';
+      s.appendChild(cv); s.appendChild(sp);
+      track.appendChild(s); slides.push(s); canvases.push(cv); rendered.push(false);
+
+      const d = document.createElement('button');
+      d.className = 'sv-dot' + (i===0?' active':'');
+      d.setAttribute('aria-label','Go to slide '+(i+1));
+      d.addEventListener('click', ()=>go(i));
+      dotsEl.appendChild(d);
+    }
+    totalEl.textContent = total;
+    sdTag.textContent = DECK_LABEL + ' · ' + total + ' slide' + (total>1?'s':'');
+  }
+
+  /* ---------- load ---------- */
+  async function load(){
+    show('loading');
+    if(!PDF_URL || /^paste/i.test(PDF_URL)){ show('setup'); return; }
+    if(typeof pdfjsLib === 'undefined'){ fail('The PDF viewer library (pdf.js) didn\u2019t load.'); return; }
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    try {
+      const url = demo ? demoPdfUrl() : PDF_URL;
+      pdf = await pdfjsLib.getDocument({ url, withCredentials:false }).promise;
+      total = pdf.numPages; idx = 0;
+      if(SP_FILE_URL) $('btnOpen').href = SP_FILE_URL;
+      buildSlides();
+      show('');                  // reveal carousel
+      go(0);
+      if(window.tcEmbedNotifyHeight) setTimeout(window.tcEmbedNotifyHeight, 300);
+    } catch(e){
+      console.warn('[process] PDF load failed:', e);
+      fail('The PDF couldn\u2019t be fetched from SharePoint. Make sure the link sharing is "People in TrueCommerce" and ends with &download=1.');
+    }
+  }
+
+  // tiny inline 2-page PDF for ?demo=1 layout preview
+  function demoPdfUrl(){
+    const pg = (n,t) => n+' 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 960 540]/Resources<</Font<</F1 99 0 R>>>>/Contents '+(n+10)+' 0 R>>endobj\n'+
+      (n+10)+' 0 obj<</Length 90>>stream\nBT /F1 44 Tf 80 300 Td ('+t+') Tj ET\nendstream endobj\n';
+    const body =
       '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n'+
-      '2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n'+
-      '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 960 540]/Resources<</Font<</F1 5 0 R>>>>/Contents 4 0 R>>endobj\n'+
-      '4 0 obj<</Length 150>>stream\nBT /F1 40 Tf 90 300 Td (Process deck - DEMO) Tj ET\n'+
-      'BT /F1 20 Tf 90 250 Td (Paste the SharePoint embed link in the code.) Tj ET\nendstream endobj\n'+
-      '5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n'+
-      'xref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n'+
-      '0000000101 00000 n \n0000000209 00000 n \n0000000400 00000 n \n'+
-      'trailer<</Size 6/Root 1 0 R>>\nstartxref\n472\n%%EOF';
-    return URL.createObjectURL(new Blob([pdf], { type:'application/pdf' })) + '#toolbar=1&view=FitH';
+      '2 0 obj<</Type/Pages/Kids[3 0 R 4 0 R]/Count 2>>endobj\n'+
+      pg(3,'Process deck - DEMO p1') + pg(4,'Process deck - DEMO p2') +
+      '99 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF';
+    return URL.createObjectURL(new Blob([body], { type:'application/pdf' }));
   }
 
-  function present(src){
-    sdTag.textContent = DECK_LABEL || 'Process deck · PDF';
-    sdMeta.innerHTML  = DECK_LABEL ? '<span>'+DECK_LABEL+'</span>' : '&nbsp;';
-    if(SP_FILE_URL){ $('btnOpen').href = SP_FILE_URL; $('errOpen').href = SP_FILE_URL; $('errOpen').style.display=''; }
+  prev.addEventListener('click', ()=>go(idx-1));
+  next.addEventListener('click', ()=>go(idx+1));
+  document.addEventListener('keydown', e=>{
+    if(states.error.classList.contains('show')||states.loading.classList.contains('show')) return;
+    if(e.key==='ArrowLeft') go(idx-1);
+    if(e.key==='ArrowRight') go(idx+1);
+  });
+  window.addEventListener('resize', ()=>{ // re-render visible page crisply after a resize
+    rendered.fill(false); go(idx);
+  });
 
-    // If the embed doesn't load within a few seconds, surface a helpful error.
-    let settled = false;
-    const guard = setTimeout(() => { if(!settled){ show('error'); } }, 9000);
-    frame.addEventListener('load', () => { settled = true; clearTimeout(guard); show('ready'); }, { once:true });
-    frame.src = src;
-  }
-
-  // Boot
-  if(demo){ present(demoUrl()); return; }
-  if(!SP_EMBED_URL || /^paste/i.test(SP_EMBED_URL)){ show('setup'); return; }
-  present(SP_EMBED_URL);
+  load();
 })();
 </script>
 

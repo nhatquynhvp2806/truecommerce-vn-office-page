@@ -79,8 +79,8 @@
         <div class="ge-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
         </div>
-        <h3>Couldn't load the deck</h3>
-        <p id="errorMsg">The PDF couldn't be fetched from SharePoint.</p>
+        <h3>Deck chưa sẵn sàng</h3>
+        <p id="errorMsg">Chưa tìm thấy file <b>process.pdf</b>. Hãy upload file PDF (đặt tên đúng <b>process.pdf</b>) vào folder <b>embeds/</b> trên GitHub.</p>
         <a class="btn btn-onnavy" id="errOpen" href="#" target="_blank" rel="noopener" style="display:none">Open in SharePoint instead</a>
       </div>
     </div>
@@ -112,6 +112,8 @@
    Tip: open with ?demo=1 to preview the carousel without SharePoint.
    ========================================================================== */
 const PDF_URL     = "process.pdf";   // ◀ file PDF đặt CÙNG thư mục với process.html trên GitHub
+// Tự dò các tên file hay gặp (Windows dễ lưu thành process.pdf.pdf). Cái nào hợp lệ thì dùng.
+const PDF_CANDIDATES = ["process.pdf", "process.pdf.pdf"];
 const SP_FILE_URL = "https://tcapc.sharepoint.com/:b:/s/VNPeopleteam-Publicfolder/IQAD3oNnbpA-TJVBNc3Vfdu9AQP8TNSKUTqSMW_tuf7MMvw?e=hFfqg1"; // "Open in SharePoint" button (bản gốc trên SharePoint)
 const DECK_LABEL  = "Bilingual deck";   // prefix on the tag (e.g. "Bilingual deck · 27 slides")
 /* ========================================================================== */
@@ -196,9 +198,16 @@ const DECK_LABEL  = "Bilingual deck";   // prefix on the tag (e.g. "Bilingual de
     if(typeof pdfjsLib === 'undefined'){ fail('The PDF viewer library (pdf.js) didn\u2019t load.'); return; }
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    // Try each candidate filename until one loads as a valid PDF.
+    const candidates = demo ? [demoPdfUrl()] : (PDF_CANDIDATES && PDF_CANDIDATES.length ? PDF_CANDIDATES : [PDF_URL]);
+    let lastErr = null;
+    pdf = null;
+    for(const url of candidates){
+      try { pdf = await pdfjsLib.getDocument({ url, withCredentials:false }).promise; break; }
+      catch(e){ lastErr = e; console.warn('[process] could not load', url, e && e.message); }
+    }
     try {
-      const url = demo ? demoPdfUrl() : PDF_URL;
-      pdf = await pdfjsLib.getDocument({ url, withCredentials:false }).promise;
+      if(!pdf) throw lastErr || new Error('no candidate loaded');
       total = pdf.numPages; idx = 0;
       if(SP_FILE_URL) $('btnOpen').href = SP_FILE_URL;
       buildSlides();
@@ -207,7 +216,7 @@ const DECK_LABEL  = "Bilingual deck";   // prefix on the tag (e.g. "Bilingual de
       if(window.tcEmbedNotifyHeight) setTimeout(window.tcEmbedNotifyHeight, 300);
     } catch(e){
       console.warn('[process] PDF load failed:', e);
-      fail('The PDF couldn\u2019t be fetched from SharePoint. Make sure the link sharing is "People in TrueCommerce" and ends with &download=1.');
+      fail('Chưa tải được PDF. Kiểm tra file PDF đã upload vào embeds/ trên GitHub (tên process.pdf, dung lượng > 2 byte).');
     }
   }
 
